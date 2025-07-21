@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: nest-postgres
+    ports:
+      - '${POSTGRES_PORT}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+    env_file:
+      - ./.env
+
+  backend:
+    build: .
+    container_name: nest-backend
+    command: sh -c "npm run start:dev"
+    depends_on:
+      - postgres
+    ports:
+      - '3000:3000'
+    networks:
+      - app-network
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./package.json:/usr/src/app/package.json
+      - ./tsconfig.json:/usr/src/app/tsconfig.json
+    restart: unless-stopped
+    env_file:
+      - ./.env
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
+    driver: bridge
