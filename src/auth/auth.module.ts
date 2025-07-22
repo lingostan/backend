@@ -4,7 +4,6 @@ import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.contoller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { jwtConstants } from './constants';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 
 @Module({
