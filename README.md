@@ -103,7 +103,7 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 2. выполнить следующую команду
 
 ```bash
-$ docker-compose exec backend npm run typeorm migration:generate -- database/migrations/Initial
+$ docker-compose exec backend npm run typeorm migration:generate -- src/database/migrations/Initial
 ```
 
 3. остановить compose и запустить заново

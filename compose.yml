@@ -31,7 +31,6 @@ services:
       - app-network
     volumes:
       - ./src:/usr/src/app/src
-      - ./database:/usr/src/app/database
       - ./package.json:/usr/src/app/package.json
       - ./tsconfig.json:/usr/src/app/tsconfig.json
     restart: unless-stopped

@@ -10,8 +10,6 @@ type DataSourceTypes = DataSourceOptions & {
 
 config();
 
-console.log(__dirname + '/../../database/migrations/*.ts');
-
 const MigrationOrmSource = new DataSource({
   type: 'postgres',
 
@@ -20,14 +18,16 @@ const MigrationOrmSource = new DataSource({
   username: env.POSTGRES_USER,
   password: env.POSTGRES_PASSWORD,
   database: env.POSTGRES_DB,
+
   entities: [__dirname + '/../**/entities/*.entity.ts'],
-  migrations: [__dirname + '/../../database/migrations/*.ts'],
+  migrations: [__dirname + '/../database/migrations/*.ts'],
+
   synchronize: false,
   logging: false,
   migrationsRun: true,
 
   cli: {
-    migrationsDir: 'database/migrations',
+    migrationsDir: 'src/database/migrations',
   },
 } as DataSourceTypes);
 
