@@ -29,7 +29,10 @@ export class UsersService {
   }
 
   async findOneByEmail(email: string): Promise<User | undefined> {
-    return await this.usersRepository.findOneBy({ email });
+    return await this.usersRepository.findOne({
+      where: { email },
+      relations: ['languages'],
+    });
   }
 
   async remove(id: string): Promise<void> {

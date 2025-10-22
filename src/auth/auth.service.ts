@@ -15,11 +15,23 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
+    const existingUser = await this.usersService.findOneByEmail(
+      registerDto.email,
+    );
+
+    if (existingUser) {
+      throw new HttpException(
+        'User with this email already exists',
+        HttpStatus.CONFLICT, // 409
+      );
+    }
+
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
     const user = await this.usersService.create({
       ...registerDto,
       password: hashedPassword,
     });
+
     const payload = { email: user.email, sub: user.id };
 
     const accessToken = this.jwtService.sign(payload, {
@@ -102,9 +114,12 @@ export class AuthService {
 
   async profile(data: CreateUserDto) {
     const user = await this.usersService.findOneByEmail(data.email);
+
     if (!user) {
       return null;
     }
-    return { name: user.name, email: user.email };
+
+    const { password, id, ...safeUser } = user;
+    return { ...safeUser };
   }
 }

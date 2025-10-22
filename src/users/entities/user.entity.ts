@@ -23,6 +23,12 @@ export class User {
   password: string;
 
   @Column({ nullable: true })
+  age?: number;
+
+  @Column()
+  sex: 'male' | 'female';
+
+  @Column({ nullable: true })
   phone?: string;
 
   @CreateDateColumn()

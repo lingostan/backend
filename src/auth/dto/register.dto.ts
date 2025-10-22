@@ -15,6 +15,14 @@ export class RegisterDto extends LoginDto {
   @IsOptional()
   role: 'user' | 'admin';
 
+  @IsString()
+  @IsOptional()
+  sex: 'male' | 'female';
+
+  @IsString()
+  @IsOptional()
+  age: number;
+
   @IsOptional()
   @Matches(/^\+7\d{10}$/, {
     message: 'Phone must be in format +79999999999',
