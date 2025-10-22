@@ -2,22 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import MigrationOrmSource from './database/typeorm.config';
 import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  try {
-    await MigrationOrmSource.initialize();
-    console.log('✅ DB connected');
-    await MigrationOrmSource.runMigrations();
-    console.log('✅ Migrations applied');
-  } catch (err) {
-    console.error('❌ DB init error:', err.message);
-  }
-
   const app = await NestFactory.create(AppModule);
 
   app.use(cookieParser());
+
+  app.setGlobalPrefix('api');
 
   app.enableCors({
     origin: true,
@@ -38,5 +30,15 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
 
   await app.listen(port);
+
+  return app.getUrl();
 }
-bootstrap();
+
+(async (): Promise<void> => {
+  try {
+    const url = await bootstrap();
+    console.log('Bootstrap', url);
+  } catch (error) {
+    console.error('Bootstrap', error);
+  }
+})();

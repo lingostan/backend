@@ -7,13 +7,15 @@ import {
   Res,
   HttpCode,
   Req,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 
 @Controller('auth')
@@ -34,7 +36,10 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return { access_token: tokens.access_token };
+    return {
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+    };
   }
 
   @Post('login')
@@ -52,13 +57,29 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return { access_token: tokens.access_token };
+    return {
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+    };
   }
 
   @UseGuards(JwtRefreshGuard)
-  @Get('refresh')
-  async refresh(@Req() req, @Res({ passthrough: true }) res: Response) {
-    const refreshToken = req.cookies['refresh_token'];
+  @Post('refresh')
+  async refresh(
+    @Req() req: Request,
+    @Body('refreshToken') refreshTokenFromBody: string | undefined,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    let refreshToken = req.cookies?.refresh_token;
+
+    if (!refreshToken) {
+      refreshToken = refreshTokenFromBody;
+    }
+
+    if (!refreshToken) {
+      throw new HttpException('Refresh token missing', HttpStatus.UNAUTHORIZED);
+    }
+
     const tokens = await this.authService.refreshTokens(refreshToken);
 
     res.cookie('refresh_token', tokens.refresh_token, {
@@ -68,12 +89,22 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return { access_token: tokens.access_token };
+    return {
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+    };
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@CurrentUser() user) {
     return this.authService.profile(user);
+  }
+
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('refresh_token');
+    return { success: true };
   }
 }

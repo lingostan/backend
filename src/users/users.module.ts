@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { User } from './entities/user.entity';
+import { UserLanguage } from './entities/user-language.entity';
+import { UserModuleProgress } from './entities/user-module-progress.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],

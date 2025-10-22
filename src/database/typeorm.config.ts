@@ -35,6 +35,9 @@ const TypeOrmConfig = {
   ...MigrationOrmSource.options,
 
   autoLoadEntities: true,
+
+  entities: [__dirname + '/**/*.entity.{js,ts}'],
+  migrations: [__dirname + '/migrations/*{.ts,.js}'],
 };
 
 export { TypeOrmConfig };

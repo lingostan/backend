@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { UserLanguage } from './user-language.entity';
 
 @Entity('users')
 export class User {
@@ -20,9 +22,18 @@ export class User {
   @Column()
   password: string;
 
+  @Column({ nullable: true })
+  phone?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => UserLanguage, (ul) => ul.user)
+  languages: UserLanguage[];
+
+  @Column({ default: 'user' })
+  role: 'user' | 'admin';
 }
