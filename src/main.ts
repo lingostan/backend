@@ -12,7 +12,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   app.enableCors({
-    origin: true,
+    origin: ['http://localhost:5173'],
     credentials: true,
   });
 
@@ -25,7 +25,6 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.useGlobalPipes(new ValidationPipe());
-  app.enableCors();
 
   const port = process.env.PORT || 3000;
 
