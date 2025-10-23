@@ -1,4 +1,13 @@
-import { IsString, IsArray, IsNotEmpty, ArrayMinSize } from 'class-validator';
+import {
+  IsString,
+  IsArray,
+  IsNotEmpty,
+  ArrayMinSize,
+  ValidateNested,
+} from 'class-validator';
+import { AlphabetItem } from '/types/language.types';
+import { AlphabetItemDto } from './alphabet-item.dto';
+import { Type } from 'class-transformer';
 
 export class CreateLanguageDto {
   @IsString()
@@ -11,6 +20,7 @@ export class CreateLanguageDto {
 
   @IsArray()
   @ArrayMinSize(1)
-  @IsString({ each: true })
-  alphabet: string[];
+  @ValidateNested({ each: true })
+  @Type(() => AlphabetItemDto)
+  alphabet: AlphabetItem[];
 }

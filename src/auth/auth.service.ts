@@ -113,7 +113,7 @@ export class AuthService {
   }
 
   async profile(data: CreateUserDto) {
-    const user = await this.usersService.findOneByEmail(data.email);
+    const user = await this.usersService.findOneByIdWithLanguages(data.email);
 
     if (!user) {
       return null;

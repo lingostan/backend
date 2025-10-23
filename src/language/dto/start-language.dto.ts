@@ -1,6 +1,6 @@
-import { IsUUID } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class StartLanguageDto {
-  @IsUUID()
-  languageId: string;
+  @IsString()
+  code: string;
 }

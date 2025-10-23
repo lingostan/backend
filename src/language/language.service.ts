@@ -48,21 +48,22 @@ export class LanguageService {
     });
   }
 
-  async startLearningLanguage(userId: string, languageId: string) {
+  async startLearningLanguage(userId: string, code: string) {
     const existing = await this.userLanguageRepository.findOne({
-      where: { user: { id: userId }, language: { id: languageId } },
+      where: { user: { id: userId }, language: { code } },
+      relations: ['language'],
     });
 
     if (existing) return existing;
 
     const language = await this.languageRepository.findOneBy({
-      id: languageId,
+      code,
     });
     if (!language) throw new NotFoundException('Language not found');
 
     const userLang = this.userLanguageRepository.create({
       user: { id: userId },
-      language: { id: languageId },
+      language: { id: language.id },
       status: 'in_progress',
     });
 
@@ -72,6 +73,7 @@ export class LanguageService {
   async findUserLanguage(userId: string, languageId: string) {
     return this.userLanguageRepository.findOne({
       where: { user: { id: userId }, language: { id: languageId } },
+      relations: ['language'],
     });
   }
 

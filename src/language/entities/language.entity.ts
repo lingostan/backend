@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { LessonModule } from '../../lesson-module/entities/lesson-module.entity';
 import { UserLanguage } from '../../users/entities/user-language.entity';
+import { AlphabetItem } from '/types/language.types';
 
 @Entity()
 export class Language {
@@ -20,7 +21,7 @@ export class Language {
   name: string;
 
   @Column('json')
-  alphabet: string[];
+  alphabet: AlphabetItem[];
 
   @CreateDateColumn()
   createdAt: Date;

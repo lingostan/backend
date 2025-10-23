@@ -24,28 +24,29 @@ export class LanguageController {
   constructor(private languageService: LanguageService) {}
 
   @Get()
-  async getLanguages(@CurrentUser() user: { id: string }) {
-    return this.languageService.getLanguagesWithProgress(user.id);
+  async getLanguages(@CurrentUser() user: { userId: string }) {
+    return this.languageService.getLanguagesWithProgress(user.userId);
   }
 
   @Post('start')
   async startLanguage(
-    @CurrentUser() user: { id: string },
+    @CurrentUser() user: { userId: string },
     @Body() startDto: StartLanguageDto,
   ) {
+    console.log(user);
     return this.languageService.startLearningLanguage(
-      user.id,
-      startDto.languageId,
+      user.userId,
+      startDto.code,
     );
   }
 
   @Get(':languageId/modules')
   async getModules(
-    @CurrentUser() user: { id: string },
+    @CurrentUser() user: { userId: string },
     @Param('languageId') languageId: string,
   ) {
     const modules = await this.languageService.getModulesWithProgress(
-      user.id,
+      user.userId,
       languageId,
     );
     if (!modules.length) {
@@ -56,12 +57,12 @@ export class LanguageController {
 
   @Get(':languageId/modules/:moduleId/questions')
   async getQuestions(
-    @CurrentUser() user: { id: string },
+    @CurrentUser() user: { userId: string },
     @Param('languageId') languageId: string,
     @Param('moduleId') moduleId: string,
   ) {
     const userLang = await this.languageService.findUserLanguage(
-      user.id,
+      user.userId,
       languageId,
     );
     if (!userLang) {
@@ -78,12 +79,12 @@ export class LanguageController {
   @Post(':languageId/modules/complete')
   @HttpCode(HttpStatus.OK)
   async completeModule(
-    @CurrentUser() user: { id: string },
+    @CurrentUser() user: { userId: string },
     @Param('languageId') languageId: string,
     @Body() completeDto: CompleteModuleDto,
   ) {
     return this.languageService.completeModule(
-      user.id,
+      user.userId,
       languageId,
       completeDto.moduleId,
       completeDto.score,

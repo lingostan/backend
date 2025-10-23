@@ -41,4 +41,11 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
   }
+
+  async findOneByIdWithLanguages(email: string) {
+    return await this.usersRepository.findOne({
+      where: { email },
+      relations: ['languages', 'languages.language'],
+    });
+  }
 }

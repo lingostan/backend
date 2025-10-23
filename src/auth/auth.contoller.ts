@@ -63,7 +63,6 @@ export class AuthController {
     };
   }
 
-  @UseGuards(JwtRefreshGuard)
   @Post('refresh')
   async refresh(
     @Req() req: Request,
