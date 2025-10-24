@@ -57,7 +57,7 @@ export class UsersService {
   async findOneByIdWithLanguages(email: string) {
     return await this.usersRepository.findOne({
       where: { email },
-      relations: ['languages', 'languages.language'],
+      relations: ['languages.language'],
     });
   }
 }

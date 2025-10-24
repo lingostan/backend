@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   ForbiddenException,
+  Delete,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -90,10 +91,15 @@ export class LanguageController {
     );
   }
 
+  @Delete(':languageId')
+  async deleteLanguage(@Param('languageId') languageId: string) {
+    return this.languageService.deleteLanguage(languageId);
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard)
   async createLanguage(
-    @CurrentUser() user: { id: string; role?: string },
+    @CurrentUser() user: { userId: string; role?: string },
     @Body() createDto: CreateLanguageDto,
   ) {
     // if (user.role !== 'admin') {

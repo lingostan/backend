@@ -195,4 +195,14 @@ export class LanguageService {
 
     return await this.languageRepository.save(language);
   }
+
+  async deleteLanguage(languageId: string) {
+    const existing = await this.languageRepository.findOne({
+      where: { id: languageId },
+    });
+
+    if (existing) {
+      return this.languageRepository.remove(existing);
+    }
+  }
 }
