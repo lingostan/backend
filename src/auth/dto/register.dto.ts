@@ -28,4 +28,8 @@ export class RegisterDto extends LoginDto {
     message: 'Phone must be in format +79999999999',
   })
   phone?: string;
+
+  @IsString()
+  @IsOptional()
+  avatar: string;
 }

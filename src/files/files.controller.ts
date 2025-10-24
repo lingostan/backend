@@ -44,6 +44,7 @@ export class FilesController {
     }),
   )
   uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
     if (!file) {
       throw new Error('Файл не загружен');
     }
@@ -55,7 +56,7 @@ export class FilesController {
 
   @Get(':filename')
   async serveFile(@Param('filename') filename: string, @Res() res: Response) {
-    if (!/^[a-f0-9]+\.(mp3|wav|jpg|jpeg|png|gif)$/i.test(filename)) {
+    if (!/^[a-f0-9-]+\.(mp3|wav|jpg|jpeg|png|gif)$/i.test(filename)) {
       throw new NotFoundException('Недопустимое имя файла');
     }
 

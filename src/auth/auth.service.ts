@@ -119,7 +119,7 @@ export class AuthService {
       return null;
     }
 
-    const { password, id, ...safeUser } = user;
+    const { password, ...safeUser } = user;
     return { ...safeUser };
   }
 }

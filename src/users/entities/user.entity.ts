@@ -37,6 +37,9 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @Column({ nullable: true })
+  avatar?: string;
+
   @OneToMany(() => UserLanguage, (ul) => ul.user)
   languages: UserLanguage[];
 

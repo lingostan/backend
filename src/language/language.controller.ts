@@ -33,7 +33,6 @@ export class LanguageController {
     @CurrentUser() user: { userId: string },
     @Body() startDto: StartLanguageDto,
   ) {
-    console.log(user);
     return this.languageService.startLearningLanguage(
       user.userId,
       startDto.code,
