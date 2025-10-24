@@ -174,9 +174,17 @@ export class LanguageService {
     });
 
     if (existing) {
-      throw new BadRequestException(
-        `Language with code "${createDto.code}" already exists`,
+      await this.languageRepository.update(
+        { code: createDto.code },
+        {
+          name: createDto.name,
+          alphabet: createDto.alphabet,
+        },
       );
+
+      return await this.languageRepository.findOne({
+        where: { code: createDto.code },
+      });
     }
 
     const language = this.languageRepository.create({
@@ -185,6 +193,6 @@ export class LanguageService {
       alphabet: createDto.alphabet,
     });
 
-    return this.languageRepository.save(language);
+    return await this.languageRepository.save(language);
   }
 }

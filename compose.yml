@@ -30,6 +30,7 @@ services:
     networks:
       - app-network
     volumes:
+      - ./public:/usr/src/app/public
       - ./src:/usr/src/app/src
       - ./package.json:/usr/src/app/package.json
       - ./tsconfig.json:/usr/src/app/tsconfig.json

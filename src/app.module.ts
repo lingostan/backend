@@ -10,6 +10,7 @@ import { Question } from './question/entities/question.entity';
 import { UserLanguage } from './users/entities/user-language.entity';
 import { UserModuleProgress } from './users/entities/user-module-progress.entity';
 import { LanguageModule } from './language/language.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { LanguageModule } from './language/language.module';
     UsersModule,
     AuthModule,
     LanguageModule,
+    FilesModule,
   ],
   controllers: [],
   providers: [],
