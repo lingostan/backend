@@ -4,7 +4,6 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { CreateUserDto } from '/users/dto/create-user.dto';
 import { jwtConstants } from './constants';
 
 @Injectable()
@@ -15,9 +14,7 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const existingUser = await this.usersService.findOneByEmail(
-      registerDto.email,
-    );
+    const existingUser = await this.usersService.findByEmail(registerDto.email);
 
     if (existingUser) {
       throw new HttpException(
@@ -51,7 +48,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.usersService.findOneByEmail(loginDto.email);
+    const user = await this.usersService.findByEmail(loginDto.email);
     if (!user)
       throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
 
@@ -83,7 +80,7 @@ export class AuthService {
         secret: jwtConstants.refreshSecret,
       });
 
-      const user = await this.usersService.findOneByEmail(payload.email);
+      const user = await this.usersService.findByEmail(payload.email);
       if (!user) throw new Error();
 
       const newPayload = { email: payload.email, sub: payload.sub };
@@ -110,16 +107,5 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED,
       );
     }
-  }
-
-  async profile(data: CreateUserDto) {
-    const user = await this.usersService.findOneByIdWithLanguages(data.email);
-
-    if (!user) {
-      return null;
-    }
-
-    const { password, ...safeUser } = user;
-    return { ...safeUser };
   }
 }

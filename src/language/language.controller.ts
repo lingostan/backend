@@ -1,111 +1,57 @@
-// src/language/language.controller.ts
 import {
   Controller,
   Get,
   Post,
   Body,
-  UseGuards,
   Param,
-  NotFoundException,
-  HttpCode,
-  HttpStatus,
-  ForbiddenException,
-  Delete,
+  UseGuards,
+  Query,
 } from '@nestjs/common';
+import { LanguageService } from './language.service';
+import { CreateLanguageDto } from './dto/create-language.dto';
+import { LanguageResponseDto } from './dto/language-response.dto';
+import { UserLanguageDto } from '../users/dto/user-language.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { LanguageService } from './language.service';
-import { StartLanguageDto } from './dto/start-language.dto';
-import { CompleteModuleDto } from './dto/complete-module.dto';
-import { CreateLanguageDto } from './dto/create-language.dto';
 
 @Controller('languages')
-@UseGuards(JwtAuthGuard)
 export class LanguageController {
-  constructor(private languageService: LanguageService) {}
+  constructor(private readonly languageService: LanguageService) {}
 
   @Get()
-  async getLanguages(@CurrentUser() user: { userId: string }) {
-    return this.languageService.getLanguagesWithProgress(user.userId);
+  async getAllLanguages(
+    @Query('active') activeOnly?: boolean,
+  ): Promise<LanguageResponseDto[]> {
+    const languages = await this.languageService.getAllLanguages(activeOnly);
+    return languages.map((lang) => new LanguageResponseDto(lang));
   }
 
-  @Post('start')
-  async startLanguage(
-    @CurrentUser() user: { userId: string },
-    @Body() startDto: StartLanguageDto,
-  ) {
-    return this.languageService.startLearningLanguage(
-      user.userId,
-      startDto.code,
-    );
-  }
-
-  @Get(':languageId/modules')
-  async getModules(
-    @CurrentUser() user: { userId: string },
-    @Param('languageId') languageId: string,
-  ) {
-    const modules = await this.languageService.getModulesWithProgress(
-      user.userId,
-      languageId,
-    );
-    if (!modules.length) {
-      throw new NotFoundException('Language not found or no modules available');
-    }
-    return modules;
-  }
-
-  @Get(':languageId/modules/:moduleId/questions')
-  async getQuestions(
-    @CurrentUser() user: { userId: string },
-    @Param('languageId') languageId: string,
-    @Param('moduleId') moduleId: string,
-  ) {
-    const userLang = await this.languageService.findUserLanguage(
-      user.userId,
-      languageId,
-    );
-    if (!userLang) {
-      throw new NotFoundException('You must start this language first');
-    }
-
-    const questions = await this.languageService.getModuleQuestions(moduleId);
-    if (!questions.length) {
-      throw new NotFoundException('Module not found or no questions');
-    }
-    return questions;
-  }
-
-  @Post(':languageId/modules/complete')
-  @HttpCode(HttpStatus.OK)
-  async completeModule(
-    @CurrentUser() user: { userId: string },
-    @Param('languageId') languageId: string,
-    @Body() completeDto: CompleteModuleDto,
-  ) {
-    return this.languageService.completeModule(
-      user.userId,
-      languageId,
-      completeDto.moduleId,
-      completeDto.score,
-    );
-  }
-
-  @Delete(':languageId')
-  async deleteLanguage(@Param('languageId') languageId: string) {
-    return this.languageService.deleteLanguage(languageId);
+  @Get(':id')
+  async getLanguage(@Param('id') id: number): Promise<LanguageResponseDto> {
+    const language = await this.languageService.getLanguageById(id);
+    return new LanguageResponseDto(language);
   }
 
   @Post()
   @UseGuards(JwtAuthGuard)
   async createLanguage(
-    @CurrentUser() user: { userId: string; role?: string },
-    @Body() createDto: CreateLanguageDto,
-  ) {
-    // if (user.role !== 'admin') {
-    //   throw new ForbiddenException('Only admins can create languages');
-    // }
+    @Body() createLanguageDto: CreateLanguageDto,
+  ): Promise<LanguageResponseDto> {
+    const language =
+      await this.languageService.createLanguage(createLanguageDto);
+    return new LanguageResponseDto(language);
+  }
 
-    return this.languageService.createLanguage(createDto);
+  @Post(':id/start')
+  @UseGuards(JwtAuthGuard)
+  async startLanguage(
+    @CurrentUser() user: { userId: string },
+    @Param('id') id: number,
+  ): Promise<UserLanguageDto> {
+    const userLanguage = await this.languageService.startLanguage(
+      user.userId,
+      id,
+    );
+    return new UserLanguageDto(userLanguage);
   }
 }

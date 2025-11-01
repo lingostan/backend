@@ -1,22 +1,45 @@
+import { Type } from 'class-transformer';
 import {
   IsString,
+  IsNumber,
+  IsOptional,
+  IsUrl,
+  Min,
+  Max,
+  Length,
   IsArray,
-  IsNotEmpty,
   ArrayMinSize,
   ValidateNested,
 } from 'class-validator';
-import { AlphabetItem } from '/types/language.types';
+
+import { AlphabetItem } from '../../types/language';
 import { AlphabetItemDto } from './alphabet-item.dto';
-import { Type } from 'class-transformer';
 
 export class CreateLanguageDto {
   @IsString()
-  @IsNotEmpty()
+  @Length(2, 5)
   code: string;
 
   @IsString()
-  @IsNotEmpty()
   name: string;
+
+  @IsOptional()
+  @IsString()
+  flagEmoji?: string;
+
+  @IsOptional()
+  @IsUrl()
+  flagUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(5)
+  difficulty?: number;
 
   @IsArray()
   @ArrayMinSize(1)

@@ -14,9 +14,7 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { CurrentUser } from './decorators/current-user.decorator';
 import { Response, Request } from 'express';
-import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -92,12 +90,6 @@ export class AuthController {
       access_token: tokens.access_token,
       refresh_token: tokens.refresh_token,
     };
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  getProfile(@CurrentUser() user) {
-    return this.authService.profile(user);
   }
 
   @Post('logout')

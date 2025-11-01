@@ -5,14 +5,13 @@ import {
   OneToMany,
   CreateDateColumn,
 } from 'typeorm';
-import { LessonModule } from '../../lesson-module/entities/lesson-module.entity';
-import { UserLanguage } from '../../users/entities/user-language.entity';
-import { AlphabetItem } from '/types/language.types';
+import { Mods } from '../../learning/mods/entities/mods.entity';
+import { AlphabetItem } from '/types/language';
 
 @Entity()
 export class Language {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ unique: true })
   code: string;
@@ -20,15 +19,33 @@ export class Language {
   @Column()
   name: string;
 
+  @Column({ nullable: true })
+  flagEmoji: string;
+
+  @Column({ nullable: true })
+  flagUrl: string;
+
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
+  @Column({ default: 0 })
+  difficulty: number; // 1-5
+
+  @Column({ default: true })
+  isActive: boolean;
+
+  @Column({ default: 0 })
+  totalModules: number;
+
+  @Column({ default: 0 })
+  totalExercises: number;
+
   @Column('json')
   alphabet: AlphabetItem[];
 
+  @OneToMany(() => Mods, (module) => module.language)
+  mods: Mods[];
+
   @CreateDateColumn()
   createdAt: Date;
-
-  @OneToMany(() => LessonModule, (module) => module.language)
-  modules: LessonModule[];
-
-  @OneToMany(() => UserLanguage, (ul) => ul.language)
-  userLanguages: UserLanguage[];
 }

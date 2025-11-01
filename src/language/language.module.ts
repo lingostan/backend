@@ -1,22 +1,31 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { LanguageController } from './language.controller';
 import { LanguageService } from './language.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { LessonModule } from '/lesson-module/entities/lesson-module.entity';
-import { Question } from '/question/entities/question.entity';
-import { UserLanguage } from '/users/entities/user-language.entity';
-import { UserModuleProgress } from '/users/entities/user-module-progress.entity';
 import { Language } from './entities/language.entity';
+import { UsersModule } from '../users/users.module';
+import { Mods } from '../learning/mods/entities/mods.entity';
+import { Lesson } from '../learning/lessons/entities/lesson.entity';
+import { Exercise } from '../learning/exercises/entities/exercise.entity';
+import { UserExerciseProgress } from '../learning/progress/entities/user-exercise-progress.entity';
+import { UserProgress } from '../learning/progress/entities/user-progress.entity';
+import { UserLessonProgress } from '../learning/progress/entities/user-lesson-progress.entity';
+import { UserModuleProgress } from '../learning/progress/entities/user-module-progress.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Language,
-      LessonModule,
-      Question,
-      UserLanguage,
+      Mods,
+      Lesson,
+      Exercise,
+      UserExerciseProgress,
+      UserLessonProgress,
       UserModuleProgress,
+      UserProgress,
     ]),
+    UsersModule,
   ],
   controllers: [LanguageController],
   providers: [LanguageService],

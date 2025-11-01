@@ -1,65 +1,71 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  UsePipes,
-  ValidationPipe,
   UseGuards,
+  Param,
+  Post,
   Put,
+  Body,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
-import { JwtAuthGuard } from '/auth/guards/jwt-auth.guard';
+import { UserResponseDto } from './dto/user-response.dto';
+import { UserLanguageDto } from './dto/user-language.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-@ApiTags('users')
 @Controller('users')
 @UseGuards(JwtAuthGuard)
-@UsePipes(new ValidationPipe())
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create a new user' })
-  @ApiResponse({ status: 201, description: 'User created successfully.' })
-  @ApiResponse({ status: 400, description: 'Bad Request.' })
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.create(createUserDto);
+  @Get('profile')
+  async getProfile(
+    @CurrentUser() user: { userId: string },
+  ): Promise<UserResponseDto> {
+    const userWithLanguages = await this.usersService.getUserWithLanguages(
+      user.userId,
+    );
+    return new UserResponseDto(userWithLanguages);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update user by ID' })
-  @ApiResponse({ status: 200, description: 'User updated successfully.' })
-  @ApiResponse({ status: 404, description: 'User not found.' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return await this.usersService.update(id, updateUserDto);
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: 200, description: 'Return all users.' })
-  async findAll() {
-    return await this.usersService.findAll();
+  @Get('languages')
+  async getUserLanguages(
+    @CurrentUser() user: User,
+  ): Promise<UserLanguageDto[]> {
+    const userWithLanguages = await this.usersService.getUserWithLanguages(
+      user.id.toString(),
+    );
+    return userWithLanguages.languages.map((lang) => new UserLanguageDto(lang));
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get user by ID' })
-  @ApiResponse({ status: 200, description: 'User found.' })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  async findOne(@Param('id') id: string) {
-    return await this.usersService.findOne(id);
+  @Post('languages/:languageId/activate')
+  async activateLanguage(
+    @CurrentUser() user: User,
+    @Param('languageId') languageId: number,
+  ): Promise<UserLanguageDto> {
+    const userLanguage = await this.usersService.activateLanguage(
+      user.id,
+      languageId,
+    );
+    return new UserLanguageDto(userLanguage);
   }
 
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete user by ID' })
-  @ApiResponse({ status: 200, description: 'User deleted.' })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  async remove(@Param('id') id: string) {
-    await this.usersService.remove(id);
-    return { message: `User with ID ${id} deleted` };
+  @Post('languages/:languageId/deactivate')
+  async deactivateLanguage(
+    @CurrentUser() user: User,
+    @Param('languageId') languageId: number,
+  ): Promise<UserLanguageDto> {
+    const userLanguage = await this.usersService.deactivateLanguage(
+      user.id,
+      languageId,
+    );
+    return new UserLanguageDto(userLanguage);
   }
 }

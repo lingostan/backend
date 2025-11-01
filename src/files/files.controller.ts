@@ -35,7 +35,6 @@ export class FilesController {
         },
       }),
       fileFilter: (req, file, cb) => {
-        console.log(file.mimetype);
         if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|mp3|wav|mpeg)$/)) {
           return cb(new Error('Недопустимый тип файла'), false);
         }
@@ -44,7 +43,6 @@ export class FilesController {
     }),
   )
   uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
     if (!file) {
       throw new Error('Файл не загружен');
     }
