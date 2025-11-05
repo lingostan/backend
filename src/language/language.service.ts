@@ -4,17 +4,27 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 
 import { Language } from './entities/language.entity';
-import { CreateLanguageDto } from './dto/create-language.dto';
+import {
+  CreateAlphabetItemDto,
+  CreateLanguageDto,
+} from './dto/create-language.dto';
 import { UsersService } from '../users/users.service';
+import { AlphabetItem } from './entities/alphabet-item.entity';
+import {
+  UpdateAlphabetItemDto,
+  UpdateLanguageDto,
+} from './dto/update-language.dto';
 
 @Injectable()
 export class LanguageService {
   constructor(
     @InjectRepository(Language)
     private readonly languageRepository: Repository<Language>,
+    @InjectRepository(AlphabetItem)
+    private readonly alphabetItemRepository: Repository<AlphabetItem>,
     private readonly usersService: UsersService,
   ) {}
 
@@ -66,7 +76,45 @@ export class LanguageService {
       );
     }
 
-    const language = this.languageRepository.create(createLanguageDto);
+    const language = this.languageRepository.create({
+      ...createLanguageDto,
+      alphabet: createLanguageDto.alphabet?.map((item) =>
+        this.alphabetItemRepository.create(item),
+      ),
+    });
+
+    return this.languageRepository.save(language);
+  }
+
+  async updateLanguage(
+    id: number,
+    updateLanguageDto: UpdateLanguageDto,
+  ): Promise<Language> {
+    const language = await this.getLanguageById(id);
+
+    if (updateLanguageDto.code || updateLanguageDto.name) {
+      const existingLanguage = await this.languageRepository.findOne({
+        where: [
+          { code: updateLanguageDto.code, id: Not(id) },
+          { name: updateLanguageDto.name, id: Not(id) },
+        ],
+      });
+
+      if (existingLanguage) {
+        throw new ConflictException(
+          'Language with this code or name already exists',
+        );
+      }
+    }
+
+    Object.assign(language, updateLanguageDto);
+
+    if (updateLanguageDto.alphabet !== undefined) {
+      await this.alphabetItemRepository.delete({
+        language: { id: language.id },
+      });
+    }
+
     return this.languageRepository.save(language);
   }
 
@@ -81,5 +129,40 @@ export class LanguageService {
     // когда будут реализованы соответствующие модули
 
     await this.languageRepository.save(language);
+  }
+
+  async getAlphabet(languageId: number): Promise<AlphabetItem[]> {
+    return this.alphabetItemRepository.find({
+      where: { language: { id: languageId } },
+      order: { order: 'ASC' },
+    });
+  }
+
+  async addAlphabetItem(
+    languageId: number,
+    alphabetItem: CreateAlphabetItemDto,
+  ): Promise<AlphabetItem> {
+    const language = await this.getLanguageById(languageId);
+
+    const item = this.alphabetItemRepository.create({
+      ...alphabetItem,
+      language,
+    });
+
+    return this.alphabetItemRepository.save(item);
+  }
+
+  async removeAlphabetItem(alphabetItemId: number): Promise<void> {
+    await this.alphabetItemRepository.delete(alphabetItemId);
+  }
+
+  async deleteLanguage(languageId: number) {
+    const existing = await this.languageRepository.findOne({
+      where: { id: languageId },
+    });
+
+    if (existing) {
+      return this.languageRepository.remove(existing);
+    }
   }
 }

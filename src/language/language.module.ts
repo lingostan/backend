@@ -12,6 +12,7 @@ import { UserExerciseProgress } from '../learning/progress/entities/user-exercis
 import { UserProgress } from '../learning/progress/entities/user-progress.entity';
 import { UserLessonProgress } from '../learning/progress/entities/user-lesson-progress.entity';
 import { UserModuleProgress } from '../learning/progress/entities/user-module-progress.entity';
+import { AlphabetItem } from './entities/alphabet-item.entity';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UserModuleProgress } from '../learning/progress/entities/user-module-pr
       UserLessonProgress,
       UserModuleProgress,
       UserProgress,
+      AlphabetItem,
     ]),
     UsersModule,
   ],

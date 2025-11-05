@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { Mods } from '../../learning/mods/entities/mods.entity';
-import { AlphabetItem } from '/types/language';
+import { AlphabetItem } from './alphabet-item.entity';
 
 @Entity()
 export class Language {
@@ -40,7 +40,10 @@ export class Language {
   @Column({ default: 0 })
   totalExercises: number;
 
-  @Column('json')
+  @OneToMany(() => AlphabetItem, (alphabetItem) => alphabetItem.language, {
+    cascade: true,
+    eager: true,
+  })
   alphabet: AlphabetItem[];
 
   @OneToMany(() => Mods, (module) => module.language)

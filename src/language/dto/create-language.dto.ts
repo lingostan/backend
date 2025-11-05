@@ -12,8 +12,32 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-import { AlphabetItem } from '../../types/language';
-import { AlphabetItemDto } from './alphabet-item.dto';
+export class CreateAlphabetItemDto {
+  @IsString()
+  letter: string;
+
+  @IsString()
+  transcription: string;
+
+  @IsOptional()
+  audioUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  exampleWord?: string;
+
+  @IsOptional()
+  @IsString()
+  exampleTranslation?: string;
+
+  @IsOptional()
+  @IsUrl()
+  exampleImageUrl?: string;
+
+  @IsNumber()
+  @Min(0)
+  order: number;
+}
 
 export class CreateLanguageDto {
   @IsString()
@@ -37,13 +61,14 @@ export class CreateLanguageDto {
 
   @IsOptional()
   @IsNumber()
-  @Min(1)
+  @Min(0)
   @Max(5)
   difficulty?: number;
 
+  @IsOptional()
   @IsArray()
-  @ArrayMinSize(1)
   @ValidateNested({ each: true })
-  @Type(() => AlphabetItemDto)
-  alphabet: AlphabetItem[];
+  @ArrayMinSize(1)
+  @Type(() => CreateAlphabetItemDto)
+  alphabet?: CreateAlphabetItemDto[];
 }

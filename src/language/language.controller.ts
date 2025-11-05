@@ -6,6 +6,8 @@ import {
   Param,
   UseGuards,
   Query,
+  Patch,
+  Delete,
 } from '@nestjs/common';
 import { LanguageService } from './language.service';
 import { CreateLanguageDto } from './dto/create-language.dto';
@@ -13,6 +15,7 @@ import { LanguageResponseDto } from './dto/language-response.dto';
 import { UserLanguageDto } from '../users/dto/user-language.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { UpdateLanguageDto } from './dto/update-language.dto';
 
 @Controller('languages')
 export class LanguageController {
@@ -53,5 +56,24 @@ export class LanguageController {
       id,
     );
     return new UserLanguageDto(userLanguage);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  async updateLanguage(
+    @Param('id') id: number,
+    @Body() updateLanguageDto: UpdateLanguageDto,
+  ): Promise<LanguageResponseDto> {
+    const language = await this.languageService.updateLanguage(
+      id,
+      updateLanguageDto,
+    );
+    return new LanguageResponseDto(language);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  async deleteLanguage(@Param('id') id: number) {
+    return this.languageService.deleteLanguage(id);
   }
 }
