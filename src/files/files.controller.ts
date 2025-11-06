@@ -11,9 +11,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { basename, extname, join } from 'path';
-import { createReadStream, existsSync } from 'fs';
+import { existsSync } from 'fs';
 import { Response, Express } from 'express';
-import { Multer } from 'multer';
 
 const uploadPath = join(__dirname, '..', '..', 'public', 'uploads');
 

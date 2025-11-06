@@ -5,9 +5,11 @@ import {
   ManyToOne,
   OneToMany,
   CreateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { Lesson } from '../../lessons/entities/lesson.entity';
 import { UserExerciseProgress } from '../../progress/entities/user-exercise-progress.entity';
+import { Language } from '/language/entities/language.entity';
 
 export enum ExerciseType {
   MULTIPLE_CHOICE = 'MULTIPLE_CHOICE',
@@ -56,8 +58,18 @@ export class Exercise {
   @Column({ default: true })
   isActive: boolean;
 
-  @ManyToOne(() => Lesson, (lesson) => lesson.exercises)
-  lesson: Lesson;
+  @ManyToOne(() => Lesson, (lesson) => lesson.exercises, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  lesson: Lesson | null;
+
+  @ManyToOne(() => Language, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'languageId' })
+  language: Language | null;
 
   @OneToMany(() => UserExerciseProgress, (progress) => progress.exercise)
   userProgress: UserExerciseProgress[];

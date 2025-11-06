@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { LanguageModule } from './language/language.module';
 import { FilesModule } from './files/files.module';
+import { LearningModule } from './learning/learning.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { FilesModule } from './files/files.module';
     AuthModule,
     LanguageModule,
     FilesModule,
+    LearningModule,
   ],
   controllers: [],
   providers: [],

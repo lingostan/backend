@@ -41,6 +41,11 @@ export class CreateExerciseDto {
   @IsString()
   explanation?: string;
 
+  @IsOptional()
   @IsNumber()
-  lessonId: number;
+  lessonId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  languageId?: number;
 }

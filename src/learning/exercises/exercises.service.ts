@@ -2,23 +2,69 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Exercise } from './entities/exercise.entity';
+import { Exercise, ExerciseType } from './entities/exercise.entity';
 import { CompleteExerciseDto } from './dto/complete-exercise.dto';
 import { UsersService } from '../../users/users.service';
 import { User } from '../../users/entities/user.entity';
 import { UserExerciseProgress } from '../progress/entities/user-exercise-progress.entity';
 import { ProgressService } from '../progress/progress.service';
+import { CreateExerciseDto } from './dto/create-exercise.dto';
+import { Language } from '/language/entities/language.entity';
 
 @Injectable()
 export class ExercisesService {
   constructor(
     @InjectRepository(Exercise)
     private readonly exerciseRepository: Repository<Exercise>,
+    @InjectRepository(Language)
+    private readonly languageRepository: Repository<Language>,
     @InjectRepository(UserExerciseProgress)
     private readonly userExerciseProgressRepository: Repository<UserExerciseProgress>,
     private readonly progressService: ProgressService,
     private readonly usersService: UsersService,
   ) {}
+
+  async getAllExercises(languageId?: number, type?: ExerciseType) {
+    const where: any = {};
+
+    if (languageId) {
+      where.language = { id: languageId };
+    }
+
+    if (type) {
+      where.type = type;
+    }
+
+    return await this.exerciseRepository.find({
+      where,
+    });
+  }
+
+  async createExercise(createExerciseDto: CreateExerciseDto): Promise<any> {
+    const exerciseData: any = {
+      ...createExerciseDto,
+    };
+
+    // if (createExerciseDto.lessonId) {
+    //   exerciseData.lesson = { id: createExerciseDto.lessonId } as Lesson;
+    // }
+
+    const lang = await this.languageRepository.findOne({
+      where: { id: createExerciseDto.languageId },
+    });
+
+    if (createExerciseDto.languageId) {
+      exerciseData.language = lang;
+    }
+
+    // delete exerciseData.lessonId;
+    delete exerciseData.languageId;
+
+    const exercise = this.exerciseRepository.create(exerciseData);
+    const savedExercise = await this.exerciseRepository.save(exercise);
+
+    return savedExercise as unknown as Exercise;
+  }
 
   async getExercisesWithProgress(
     userId: string,

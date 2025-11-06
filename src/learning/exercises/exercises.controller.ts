@@ -1,4 +1,13 @@
-import { Controller, Get, Param, Post, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  UseGuards,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { ExerciseResponseDto } from './dto/exercise-response.dto';
 import { CompleteExerciseDto } from './dto/complete-exercise.dto';
 import { ExerciseResultDto } from './dto/exercise-result.dto';
@@ -6,11 +15,26 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import { User } from '../../users/entities/user.entity';
 import { ExercisesService } from './exercises.service';
+import { CreateExerciseDto } from './dto/create-exercise.dto';
+import { ExerciseType } from './entities/exercise.entity';
 
 @Controller('learning/exercises')
 @UseGuards(JwtAuthGuard)
 export class ExercisesController {
   constructor(private readonly exercisesService: ExercisesService) {}
+
+  @Put()
+  async createExercise(@Body() exercise: CreateExerciseDto) {
+    return await this.exercisesService.createExercise(exercise);
+  }
+
+  @Get()
+  async getAllExercises(
+    @Query('languageId') languageId?: number,
+    @Query('type') type?: ExerciseType,
+  ) {
+    return await this.exercisesService.getAllExercises(languageId, type);
+  }
 
   @Get('lesson/:lessonId')
   async getExercisesByLesson(
