@@ -29,8 +29,10 @@ export class AuthController {
 
     res.cookie('refresh_token', tokens.refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: true, // Обязательно true для HTTPS
+      sameSite: 'none', // Для cross-domain
+      domain: '.gilaniel.ru', // Ваш домен API
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -50,8 +52,10 @@ export class AuthController {
 
     res.cookie('refresh_token', tokens.refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: true, // Обязательно true для HTTPS
+      sameSite: 'none', // Для cross-domain
+      domain: '.gilaniel.ru', // Ваш домен API
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -81,8 +85,10 @@ export class AuthController {
 
     res.cookie('refresh_token', tokens.refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: true, // Обязательно true для HTTPS
+      sameSite: 'none', // Для cross-domain
+      domain: '.gilaniel.ru', // Ваш домен API
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
