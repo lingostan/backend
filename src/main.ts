@@ -11,10 +11,10 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
-  app.enableCors({
-    origin: ['http://localhost:5173', 'http://localhost:8081'],
-    credentials: true,
-  });
+  // app.enableCors({
+  //   origin: ['http://localhost:5173', 'http://localhost:8081'],
+  //   credentials: true,
+  // });
 
   const config = new DocumentBuilder()
     .setTitle('API')
