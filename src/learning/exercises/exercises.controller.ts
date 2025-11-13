@@ -7,6 +7,8 @@ import {
   UseGuards,
   Put,
   Query,
+  Delete,
+  Patch,
 } from '@nestjs/common';
 import { ExerciseResponseDto } from './dto/exercise-response.dto';
 import { CompleteExerciseDto } from './dto/complete-exercise.dto';
@@ -17,6 +19,7 @@ import { User } from '../../users/entities/user.entity';
 import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { ExerciseType } from './entities/exercise.entity';
+import { UpdateExerciseDto } from './dto/update-exercise.dto';
 
 @Controller('learning/exercises')
 @UseGuards(JwtAuthGuard)
@@ -26,6 +29,14 @@ export class ExercisesController {
   @Put()
   async createExercise(@Body() exercise: CreateExerciseDto) {
     return await this.exercisesService.createExercise(exercise);
+  }
+
+  @Patch(':id')
+  async updateExercise(
+    @Param('id') id: number,
+    @Body() updateExerciseDto: UpdateExerciseDto,
+  ) {
+    return this.exercisesService.updateExercise(id, updateExerciseDto);
   }
 
   @Get()
@@ -89,5 +100,12 @@ export class ExercisesController {
     @Param('id') exerciseId: number,
   ): Promise<{ completed: boolean; score: number; attempts: number }> {
     return this.exercisesService.getExerciseProgress(user.id, exerciseId);
+  }
+
+  @Delete(':id')
+  async deleteExercise(@Param('id') id: number) {
+    await this.exercisesService.deleteExercise(id);
+
+    return { message: 'Exercise deleted' };
   }
 }

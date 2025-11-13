@@ -13,6 +13,7 @@ import { diskStorage } from 'multer';
 import { basename, extname, join } from 'path';
 import { existsSync } from 'fs';
 import { Response, Express } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 
 const uploadPath = join(__dirname, '..', '..', 'public', 'uploads');
 
@@ -24,13 +25,14 @@ export class FilesController {
       storage: diskStorage({
         destination: uploadPath,
         filename: (req, file, cb) => {
-          const originalName = basename(
-            file.originalname,
-            extname(file.originalname),
+          const decodedName = Buffer.from(file.originalname, 'latin1').toString(
+            'utf8',
           );
-          const fileExt = extname(file.originalname);
+          const originalName = basename(decodedName, extname(decodedName));
+          const fileExt = extname(decodedName);
+          const randomName = uuidv4();
 
-          return cb(null, `${originalName}${fileExt}`);
+          return cb(null, `${originalName}-5423-${randomName}${fileExt}`);
         },
       }),
       fileFilter: (req, file, cb) => {
@@ -53,11 +55,17 @@ export class FilesController {
 
   @Get(':filename')
   async serveFile(@Param('filename') filename: string, @Res() res: Response) {
-    if (!/^[a-f0-9-]+\.(mp3|wav|jpg|jpeg|png|gif)$/i.test(filename)) {
+    const decodedFilename = decodeURIComponent(filename);
+
+    if (
+      !/^[a-zA-Zа-яА-Я0-9\s\-_\.«»()]+\.(mp3|wav|jpg|jpeg|png|gif)$/i.test(
+        decodedFilename,
+      )
+    ) {
       throw new NotFoundException('Недопустимое имя файла');
     }
 
-    const filePath = join(uploadPath, filename);
+    const filePath = join(uploadPath, decodedFilename);
 
     if (!existsSync(filePath)) {
       throw new NotFoundException('Файл не найден');

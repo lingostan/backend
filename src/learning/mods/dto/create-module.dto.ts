@@ -5,6 +5,7 @@ import {
   IsEnum,
   IsUrl,
   Min,
+  IsArray,
 } from 'class-validator';
 
 export class CreateModuleDto {
@@ -32,4 +33,9 @@ export class CreateModuleDto {
 
   @IsNumber()
   languageId: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  lessonIds?: number[];
 }

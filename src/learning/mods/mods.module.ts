@@ -8,10 +8,12 @@ import { UserModuleProgress } from '../progress/entities/user-module-progress.en
 import { LessonsModule } from '../lessons/lessons.module';
 import { UsersModule } from '../../users/users.module';
 import { Lesson } from '../lessons/entities/lesson.entity';
+import { LanguageModule } from '/language/language.module';
+import { Language } from '/language/entities/language.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Mods, UserModuleProgress, Lesson]),
+    TypeOrmModule.forFeature([Mods, UserModuleProgress, Lesson, Language]),
     LessonsModule,
     UsersModule,
   ],

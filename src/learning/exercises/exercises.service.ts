@@ -10,6 +10,8 @@ import { UserExerciseProgress } from '../progress/entities/user-exercise-progres
 import { ProgressService } from '../progress/progress.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { Language } from '/language/entities/language.entity';
+import { Lesson } from '../lessons/entities/lesson.entity';
+import { UpdateExerciseDto } from './dto/update-exercise.dto';
 
 @Injectable()
 export class ExercisesService {
@@ -18,6 +20,8 @@ export class ExercisesService {
     private readonly exerciseRepository: Repository<Exercise>,
     @InjectRepository(Language)
     private readonly languageRepository: Repository<Language>,
+    @InjectRepository(Lesson)
+    private readonly lessonRepository: Repository<Lesson>,
     @InjectRepository(UserExerciseProgress)
     private readonly userExerciseProgressRepository: Repository<UserExerciseProgress>,
     private readonly progressService: ProgressService,
@@ -37,6 +41,7 @@ export class ExercisesService {
 
     return await this.exerciseRepository.find({
       where,
+      relations: ['lesson', 'language'],
     });
   }
 
@@ -45,25 +50,84 @@ export class ExercisesService {
       ...createExerciseDto,
     };
 
-    // if (createExerciseDto.lessonId) {
-    //   exerciseData.lesson = { id: createExerciseDto.lessonId } as Lesson;
-    // }
-
     const lang = await this.languageRepository.findOne({
       where: { id: createExerciseDto.languageId },
     });
+
+    if (createExerciseDto.lessonId) {
+      const lesson = await this.lessonRepository.findOne({
+        where: { id: createExerciseDto.lessonId },
+      });
+
+      exerciseData.lesson = lesson;
+    }
 
     if (createExerciseDto.languageId) {
       exerciseData.language = lang;
     }
 
-    // delete exerciseData.lessonId;
+    delete exerciseData.lessonId;
     delete exerciseData.languageId;
 
     const exercise = this.exerciseRepository.create(exerciseData);
     const savedExercise = await this.exerciseRepository.save(exercise);
 
     return savedExercise as unknown as Exercise;
+  }
+
+  async updateExercise(
+    id: number,
+    updateExerciseDto: UpdateExerciseDto,
+  ): Promise<Exercise> {
+    const exercise = await this.exerciseRepository.findOne({
+      where: { id },
+      relations: ['language', 'lesson'],
+    });
+
+    if (!exercise) {
+      throw new NotFoundException(`Exercise with ID ${id} not found`);
+    }
+
+    const updateData: any = { ...updateExerciseDto };
+
+    if (updateExerciseDto.languageId) {
+      const lang = await this.languageRepository.findOne({
+        where: { id: updateExerciseDto.languageId },
+      });
+
+      if (!lang) {
+        throw new NotFoundException(
+          `Language with ID ${updateExerciseDto.languageId} not found`,
+        );
+      }
+
+      updateData.language = lang;
+    }
+
+    if (updateExerciseDto.lessonId) {
+      const lesson = await this.lessonRepository.findOne({
+        where: { id: updateExerciseDto.lessonId },
+      });
+
+      if (!lesson) {
+        throw new NotFoundException(
+          `Lesson with ID ${updateExerciseDto.lessonId} not found`,
+        );
+      }
+
+      updateData.lesson = lesson;
+    }
+
+    delete updateData.lessonId;
+    delete updateData.language;
+    delete updateData.languageId;
+
+    await this.exerciseRepository.update(id, updateData);
+
+    return this.exerciseRepository.findOne({
+      where: { id },
+      relations: ['language', 'lesson'],
+    });
   }
 
   async getExercisesWithProgress(
@@ -75,7 +139,7 @@ export class ExercisesService {
         lesson: { id: lessonId },
         isActive: true,
       },
-      relations: ['lesson', 'lesson.module', 'userProgress'],
+      relations: ['lesson', 'lesson.mods', 'userProgress'],
       order: { order: 'ASC' },
     });
 
@@ -93,7 +157,7 @@ export class ExercisesService {
   ): Promise<Exercise> {
     const exercise = await this.exerciseRepository.findOne({
       where: { id: exerciseId },
-      relations: ['lesson', 'lesson.module', 'userProgress'],
+      relations: ['lesson', 'lesson.mods', 'userProgress'],
     });
 
     if (!exercise) {
@@ -273,5 +337,9 @@ export class ExercisesService {
     } catch (error) {
       console.error('Error updating user progress:', error);
     }
+  }
+
+  async deleteExercise(id: number) {
+    await this.exerciseRepository.delete(id);
   }
 }

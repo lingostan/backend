@@ -1,21 +1,162 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { Lesson } from './entities/lesson.entity';
 import { User } from '../../users/entities/user.entity';
 import { UserLessonProgress } from '../progress/entities/user-lesson-progress.entity';
 import { ExercisesService } from '../exercises/exercises.service';
+import { Mods } from '../mods/entities/mods.entity';
+import { CreateLessonDto } from './dto/create-lesson.dto';
+import { Exercise } from '../exercises/entities/exercise.entity';
+import { UpdateLessonDto } from './dto/update-lesson.dto';
 
 @Injectable()
 export class LessonsService {
   constructor(
+    @InjectRepository(Mods)
+    private readonly moduleRepository: Repository<Mods>,
     @InjectRepository(Lesson)
     private readonly lessonRepository: Repository<Lesson>,
+    @InjectRepository(Exercise)
+    private readonly exerciseRepository: Repository<Exercise>,
     @InjectRepository(UserLessonProgress)
     private readonly userLessonProgressRepository: Repository<UserLessonProgress>,
     private readonly exercisesService: ExercisesService,
   ) {}
+
+  async getAllLessons(moduleId?: number): Promise<Lesson[]> {
+    const where: any = {};
+
+    if (moduleId) {
+      where.mods = { id: moduleId };
+    }
+
+    return await this.lessonRepository.find({
+      where,
+      relations: ['mods', 'exercises'],
+      order: { order: 'ASC' },
+    });
+  }
+
+  async createLesson(createLessonDto: CreateLessonDto): Promise<Lesson> {
+    const lessonData: any = {
+      ...createLessonDto,
+    };
+
+    const module = await this.moduleRepository.findOne({
+      where: { id: createLessonDto.moduleId },
+    });
+
+    if (!module) {
+      throw new NotFoundException(
+        `Module with ID ${createLessonDto.moduleId} not found`,
+      );
+    }
+
+    lessonData.mods = module;
+
+    delete lessonData.moduleId;
+    delete lessonData.exerciseIds;
+
+    const lesson = this.lessonRepository.create(lessonData);
+    const savedLesson = (await this.lessonRepository.save(
+      lesson,
+    )) as unknown as Lesson;
+
+    if (createLessonDto.exerciseIds && createLessonDto.exerciseIds.length > 0) {
+      await this.linkExercisesToLesson(
+        savedLesson.id,
+        createLessonDto.exerciseIds,
+      );
+    }
+
+    return this.lessonRepository.findOne({
+      where: { id: savedLesson.id },
+      relations: ['mods', 'exercises'],
+    });
+  }
+
+  async updateLesson(
+    id: number,
+    updateLessonDto: UpdateLessonDto,
+  ): Promise<Lesson> {
+    const lesson = await this.lessonRepository.findOne({
+      where: { id },
+      relations: ['mods', 'exercises'],
+    });
+
+    if (!lesson) {
+      throw new NotFoundException(`Lesson with ID ${id} not found`);
+    }
+
+    const updateData: any = { ...updateLessonDto };
+
+    console.log(updateData);
+
+    if (updateLessonDto.moduleId) {
+      const module = await this.moduleRepository.findOne({
+        where: { id: updateLessonDto.moduleId },
+      });
+
+      if (!module) {
+        throw new NotFoundException(
+          `Module with ID ${updateLessonDto.moduleId} not found`,
+        );
+      }
+
+      updateData.mods = module;
+    }
+
+    if (updateLessonDto.exerciseIds !== undefined) {
+      await this.unlinkExercisesFromLesson(id);
+
+      if (updateLessonDto.exerciseIds.length > 0) {
+        await this.linkExercisesToLesson(id, updateLessonDto.exerciseIds);
+      }
+    }
+
+    delete updateData.moduleId;
+    delete updateData.exerciseIds;
+    delete updateData.exercises;
+    delete updateData.mods;
+
+    await this.lessonRepository.update(id, updateData);
+
+    return this.lessonRepository.findOne({
+      where: { id },
+      relations: ['mods', 'exercises'],
+    });
+  }
+
+  private async unlinkExercisesFromLesson(lessonId: number): Promise<void> {
+    await this.exerciseRepository
+      .createQueryBuilder()
+      .update(Exercise)
+      .set({ lesson: null })
+      .where('lessonId = :lessonId', { lessonId })
+      .execute();
+  }
+
+  private async linkExercisesToLesson(
+    lessonId: number,
+    exerciseIds: number[],
+  ): Promise<void> {
+    const exercises = await this.exerciseRepository.findBy({
+      id: In(exerciseIds),
+    });
+
+    if (exercises.length !== exerciseIds.length) {
+      const foundIds = exercises.map((exercise) => exercise.id);
+      const missingIds = exerciseIds.filter((id) => !foundIds.includes(id));
+      console.warn(`Some exercises not found: ${missingIds.join(', ')}`);
+    }
+
+    for (const exercise of exercises) {
+      exercise.lesson = { id: lessonId } as any;
+      await this.exerciseRepository.save(exercise);
+    }
+  }
 
   async getLessonsWithProgress(
     userId: string,
@@ -26,7 +167,7 @@ export class LessonsService {
         mods: { id: moduleId },
         isActive: true,
       },
-      relations: ['module', 'module.language', 'exercises', 'userProgress'],
+      relations: ['mods', 'mods.language', 'exercises', 'userProgress'],
       order: { order: 'ASC' },
     });
 
@@ -44,7 +185,7 @@ export class LessonsService {
   ): Promise<Lesson> {
     const lesson = await this.lessonRepository.findOne({
       where: { id: lessonId },
-      relations: ['module', 'module.language', 'exercises', 'userProgress'],
+      relations: ['mods', 'mods.language', 'exercises', 'userProgress'],
     });
 
     if (!lesson) {
@@ -142,5 +283,21 @@ export class LessonsService {
       total: totalExercises,
       percentage: Math.round(percentage),
     };
+  }
+
+  async deleteLesson(lessonId: string) {
+    await this.exerciseRepository
+      .createQueryBuilder()
+      .update(Exercise)
+      .set({ lesson: null })
+      .where('lessonId = :lessonId', { lessonId })
+      .execute();
+
+    await this.lessonRepository
+      .createQueryBuilder()
+      .delete()
+      .from(Lesson)
+      .where('id = :lessonId', { lessonId })
+      .execute();
   }
 }

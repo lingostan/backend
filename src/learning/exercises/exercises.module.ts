@@ -9,10 +9,16 @@ import { ExercisesController } from './exercises.controller';
 import { ExercisesService } from './exercises.service';
 import { LanguageModule } from '/language/language.module';
 import { Language } from '/language/entities/language.entity';
+import { Lesson } from '../lessons/entities/lesson.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Exercise, UserExerciseProgress, Language]),
+    TypeOrmModule.forFeature([
+      Exercise,
+      UserExerciseProgress,
+      Language,
+      Lesson,
+    ]),
     ProgressModule,
     UsersModule,
   ],

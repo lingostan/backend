@@ -12,7 +12,7 @@ import { ExercisesModule } from '../exercises/exercises.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Lesson, UserLessonProgress, Mods]),
+    TypeOrmModule.forFeature([Lesson, UserLessonProgress, Mods, Exercise]),
     ExercisesModule,
     UsersModule,
   ],

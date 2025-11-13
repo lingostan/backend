@@ -37,4 +37,9 @@ export class CreateLessonDto {
 
   @IsNumber()
   moduleId: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  exerciseIds?: number[];
 }
