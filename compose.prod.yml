@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: nest-postgres
+    ports:
+      - '${POSTGRES_PORT}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network-prod
+    env_file:
+      - ./.env
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: .
+    container_name: nest-backend
+    command: sh -c "npm run start:dev"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '3000:3000'
+    networks:
+      - app-network-prod
+    volumes:
+      - ./public:/usr/src/app/public
+      - ./src:/usr/src/app/src
+      - ./package.json:/usr/src/app/package.json
+      - ./tsconfig.json:/usr/src/app/tsconfig.json
+    restart: unless-stopped
+    environment:
+      - POSTGRES_HOST=postgres
+      - NODE_ENV=production
+    env_file:
+      - ./.env
+
+volumes:
+  pgdata:
+
+networks:
+  app-network-prod:
+    driver: bridge

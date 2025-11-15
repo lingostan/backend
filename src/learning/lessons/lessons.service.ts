@@ -119,7 +119,6 @@ export class LessonsService {
     delete updateData.moduleId;
     delete updateData.exerciseIds;
     delete updateData.exercises;
-    delete updateData.mods;
 
     await this.lessonRepository.update(id, updateData);
 
