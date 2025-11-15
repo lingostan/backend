@@ -29,10 +29,11 @@ export class AuthController {
 
     res.cookie('refresh_token', tokens.refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
-      domain: '.gilaniel.ru', // явно указать домен
+      secure: true, // Обязательно true для HTTPS
+      sameSite: 'none', // Для cross-domain
+      domain: '.gilaniel.ru', // Ваш домен API
       path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
@@ -52,10 +53,11 @@ export class AuthController {
 
     res.cookie('refresh_token', tokens.refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
-      domain: '.gilaniel.ru', // явно указать домен
+      secure: true, // Обязательно true для HTTPS
+      sameSite: 'none', // Для cross-domain
+      domain: '.gilaniel.ru', // Ваш домен API
       path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
@@ -85,11 +87,11 @@ export class AuthController {
 
     res.cookie('refresh_token', tokens.refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
-      domain: '.gilaniel.ru', // явно указать домен
+      secure: true, // Обязательно true для HTTPS
+      sameSite: 'none', // Для cross-domain
+      domain: '.gilaniel.ru', // Ваш домен API
       path: '/',
-      maxAge: 30 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return {
@@ -103,11 +105,10 @@ export class AuthController {
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('refresh_token', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
-      domain: '.gilaniel.ru', // явно указать домен
+      secure: true, // Обязательно true для HTTPS
+      sameSite: 'none', // Для cross-domain
+      domain: '.gilaniel.ru', // Ваш домен API
       path: '/',
-      maxAge: 30 * 24 * 60 * 60 * 1000,
     });
     return { success: true };
   }
