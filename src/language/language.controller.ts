@@ -24,9 +24,10 @@ export class LanguageController {
   @Get()
   async getAllLanguages(
     @Query('active') activeOnly?: boolean,
-    @Query('withAlphabet') withAlphabet?: string,
+    @Query('withAlphabet') withAlphabet?: boolean,
   ): Promise<LanguageResponseDto[]> {
-    const withAlphabetBool = withAlphabet === 'true';
+    const withAlphabetBool =
+      typeof withAlphabet === 'string' && withAlphabet === 'true';
 
     const languages = await this.languageService.getAllLanguages(
       activeOnly,
