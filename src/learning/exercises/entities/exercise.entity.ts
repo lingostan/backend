@@ -9,10 +9,11 @@ import {
 } from 'typeorm';
 import { Lesson } from '../../lessons/entities/lesson.entity';
 import { UserExerciseProgress } from '../../progress/entities/user-exercise-progress.entity';
-import { Language } from '/language/entities/language.entity';
+import { Language } from '../../../language/entities/language.entity';
 
 export enum ExerciseType {
   MULTIPLE_CHOICE = 'MULTIPLE_CHOICE',
+  MULTIPLE_CHOICE_IMGS = 'MULTIPLE_CHOICE_IMGS',
   MATCHING = 'MATCHING',
   TRANSLATION = 'TRANSLATION',
   LISTENING = 'LISTENING',

@@ -1,5 +1,6 @@
 import { Language } from '../entities/language.entity';
 import { AlphabetItemDto } from './alphabet-item.dto';
+import { Mods } from '/learning/mods/entities/mods.entity';
 
 export class LanguageResponseDto {
   id: number;
@@ -14,6 +15,7 @@ export class LanguageResponseDto {
   totalExercises: number;
   createdAt: Date;
   alphabet: AlphabetItemDto[];
+  mods: Mods[];
 
   constructor(language: Language) {
     this.id = language.id;
@@ -28,5 +30,6 @@ export class LanguageResponseDto {
     this.totalExercises = language.totalExercises;
     this.createdAt = language.createdAt;
     this.alphabet = language.alphabet;
+    this.mods = language.mods;
   }
 }

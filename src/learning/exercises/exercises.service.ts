@@ -41,7 +41,7 @@ export class ExercisesService {
 
     return await this.exerciseRepository.find({
       where,
-      relations: ['lesson', 'language'],
+      relations: ['lesson'],
     });
   }
 

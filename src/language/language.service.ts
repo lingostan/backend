@@ -28,11 +28,17 @@ export class LanguageService {
     private readonly usersService: UsersService,
   ) {}
 
-  async getAllLanguages(activeOnly: boolean = true): Promise<Language[]> {
+  async getAllLanguages(
+    activeOnly: boolean = true,
+    withAlphabet: boolean = false,
+  ): Promise<Language[]> {
     const where = activeOnly ? { isActive: true } : {};
+    const relations = Boolean(withAlphabet) ? ['alphabet'] : [];
+
     return this.languageRepository.find({
       where,
       order: { name: 'ASC' },
+      relations: relations,
     });
   }
 

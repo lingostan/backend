@@ -24,8 +24,14 @@ export class LanguageController {
   @Get()
   async getAllLanguages(
     @Query('active') activeOnly?: boolean,
+    @Query('withAlphabet') withAlphabet?: string,
   ): Promise<LanguageResponseDto[]> {
-    const languages = await this.languageService.getAllLanguages(activeOnly);
+    const withAlphabetBool = withAlphabet === 'true';
+
+    const languages = await this.languageService.getAllLanguages(
+      activeOnly,
+      withAlphabetBool,
+    );
     return languages.map((lang) => new LanguageResponseDto(lang));
   }
 
