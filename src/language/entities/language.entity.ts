@@ -40,7 +40,9 @@ export class Language {
   @Column({ default: 0 })
   totalExercises: number;
 
-  @OneToMany(() => AlphabetItem, (alphabetItem) => alphabetItem.language)
+  @OneToMany(() => AlphabetItem, (alphabetItem) => alphabetItem.language, {
+    cascade: true,
+  })
   alphabet: AlphabetItem[];
 
   @OneToMany(() => Mods, (module) => module.language)
