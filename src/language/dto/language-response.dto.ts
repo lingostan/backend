@@ -1,20 +1,41 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Language } from '../entities/language.entity';
 import { AlphabetItemDto } from './alphabet-item.dto';
 import { Mods } from '/learning/mods/entities/mods.entity';
 
 export class LanguageResponseDto {
+  @ApiProperty()
   id: number;
+  @ApiProperty()
   code: string;
+  @ApiProperty()
   name: string;
+  @ApiProperty()
   flagEmoji: string;
+  @ApiProperty()
   flagUrl: string;
+  @ApiProperty()
   description: string;
+  @ApiProperty()
   difficulty: number;
+  @ApiProperty()
   isActive: boolean;
+  @ApiProperty()
   totalModules: number;
+  @ApiProperty()
   totalExercises: number;
+  @ApiProperty()
   createdAt: Date;
+  @ApiProperty({
+    type: [AlphabetItemDto],
+  })
   alphabet: AlphabetItemDto[];
+  @ApiProperty({
+    type: 'array',
+    items: {
+      type: 'object',
+    },
+  })
   mods: Mods[];
 
   constructor(language: Language) {

@@ -1,17 +1,31 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../entities/user.entity';
 import { UserLanguageDto } from './user-language.dto';
 
 export class UserResponseDto {
+  @ApiProperty()
   id: string;
+  @ApiProperty()
   email: string;
+  @ApiProperty()
   name: string;
+  @ApiProperty()
   avatarUrl: string;
+  @ApiProperty()
   isActive: boolean;
+  @ApiProperty()
   createdAt: Date;
+  @ApiProperty()
   updatedAt: Date;
+  @ApiProperty({
+    type: [UserLanguageDto],
+  })
   languages: UserLanguageDto[];
+  @ApiProperty()
   age: number;
+  @ApiProperty()
   sex: 'male' | 'female';
+  @ApiProperty()
   phone: string;
 
   constructor(user: User) {

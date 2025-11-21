@@ -24,12 +24,16 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-    .setTitle('API')
-    .setDescription('My NestJS API')
+    .setTitle('Lingostan API')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
   app.useGlobalPipes(new ValidationPipe());
 

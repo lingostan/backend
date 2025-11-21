@@ -1,20 +1,37 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Lesson } from '../entities/lesson.entity';
 import { VocabularyItemDto } from './vocabulary-item.dto';
 
 export class LessonPreviewDto {
+  @ApiProperty()
   id: number;
+  @ApiProperty()
   title: string;
+  @ApiProperty()
   description: string;
+  @ApiProperty()
   order: number;
+  @ApiProperty()
   duration: number;
+  @ApiProperty()
   videoUrl: string;
+  @ApiProperty({
+    type: [VocabularyItemDto],
+  })
   vocabulary: VocabularyItemDto[];
+  @ApiProperty()
   grammarNotes: string;
+  @ApiProperty()
   exerciseCount: number;
+  @ApiProperty()
   totalPoints: number;
+  @ApiProperty()
   completed?: boolean;
+  @ApiProperty()
   progress?: number;
+  @ApiProperty()
   startedAt?: Date;
+  @ApiProperty()
   completedAt?: Date;
 
   constructor(lesson: Lesson) {

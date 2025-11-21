@@ -5,10 +5,12 @@ import {
 } from './create-language.dto';
 import { IsArray, IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateAlphabetItemDto extends CreateAlphabetItemDto {
   @IsOptional()
-  id?: number; // Для существующих букв
+  @ApiProperty()
+  id?: number;
 }
 
 export class UpdateLanguageDto extends PartialType(CreateLanguageDto) {
@@ -16,5 +18,8 @@ export class UpdateLanguageDto extends PartialType(CreateLanguageDto) {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => UpdateAlphabetItemDto)
+  @ApiProperty({
+    type: [UpdateAlphabetItemDto],
+  })
   alphabet?: UpdateAlphabetItemDto[];
 }

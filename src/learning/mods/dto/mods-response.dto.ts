@@ -1,22 +1,45 @@
 import { Mods } from '../entities/mods.entity';
 import { LanguageResponseDto } from '../../../language/dto/language-response.dto';
 import { LessonPreviewDto } from '../../lessons/dto/lesson-preview.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ModuleResponseDto {
+  @ApiProperty()
   id: number;
+  @ApiProperty()
   title: string;
+  @ApiProperty()
   description: string;
+  @ApiProperty()
   order: number;
+  @ApiProperty()
   difficulty: string;
+  @ApiProperty()
   imageUrl: string;
+  @ApiProperty()
   estimatedDuration: number;
+  @ApiProperty()
   totalLessons: number;
+  @ApiProperty()
   totalExercises: number;
+  @ApiProperty()
   isActive: boolean;
+  @ApiProperty({
+    type: LanguageResponseDto,
+  })
   language: LanguageResponseDto;
+  @ApiProperty()
   progress?: number;
+  @ApiProperty()
   completed?: boolean;
+  @ApiProperty({
+    type: 'array',
+    items: {
+      type: 'object',
+    },
+  })
   lessons?: LessonPreviewDto[];
+  @ApiProperty()
   createdAt: Date;
 
   constructor(mods: Mods) {

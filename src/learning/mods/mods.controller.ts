@@ -16,18 +16,52 @@ import { User } from '../../users/entities/user.entity';
 import { ModsService } from './mods.service';
 import { CreateModuleDto } from './dto/create-module.dto';
 import { UpdateModuleDto } from './dto/update-module.dto';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+} from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('learning/modules')
 @UseGuards(JwtAuthGuard)
 export class ModsController {
   constructor(private readonly modulesService: ModsService) {}
 
   @Put()
+  @ApiOperation({
+    summary: 'Создать модуль',
+  })
+  @ApiBody({
+    type: CreateModuleDto,
+  })
+  @ApiResponse({
+    status: 201,
+    type: ModuleResponseDto,
+  })
   async createExercise(@Body() module: CreateModuleDto) {
     return await this.modulesService.createModule(module);
   }
 
   @Patch(':id')
+  @ApiOperation({
+    summary: 'Обновить модуль',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+  })
+  @ApiBody({
+    type: UpdateModuleDto,
+  })
+  @ApiResponse({
+    status: 200,
+    type: ModuleResponseDto,
+  })
   async updateModule(
     @Param('id') id: number,
     @Body() updateModuleDto: UpdateModuleDto,
@@ -36,11 +70,36 @@ export class ModsController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'Получить все модули',
+  })
+  @ApiQuery({
+    name: 'languageId',
+    required: false,
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    type: [ModuleResponseDto],
+  })
   async getAllModules(@Query('languageId') languageId?: number) {
     return await this.modulesService.getAllModules(languageId);
   }
 
   @Get('language/:languageId')
+  @ApiOperation({
+    summary: 'Получить модули по языку с прогрессом',
+  })
+  @ApiParam({
+    name: 'languageId',
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    type: [ModuleResponseDto],
+  })
   async getModulesByLanguage(
     @CurrentUser() user: User,
     @Param('languageId') languageId: number,
@@ -53,6 +112,18 @@ export class ModsController {
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Получить модуль по ID',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    type: ModuleResponseDto,
+  })
   async getModule(
     @CurrentUser() user: User,
     @Param('id') id: number,
@@ -62,6 +133,23 @@ export class ModsController {
   }
 
   @Get(':id/complete')
+  @ApiOperation({
+    summary: 'Завершить модуль',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: {
+        completed: true,
+        progress: 100,
+      },
+    },
+  })
   async completeModule(
     @CurrentUser() user: User,
     @Param('id') moduleId: number,
@@ -70,6 +158,22 @@ export class ModsController {
   }
 
   @Delete(':id')
+  @ApiOperation({
+    summary: 'Удалить модуль',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: {
+        message: 'Module deleted',
+      },
+    },
+  })
   async deleteMod(@Param('id') id: number) {
     await this.modulesService.deleteMod(id);
 

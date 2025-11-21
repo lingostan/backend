@@ -2,23 +2,44 @@ import { Lesson } from '../../lessons/entities/lesson.entity';
 import { VocabularyItemDto } from './vocabulary-item.dto';
 import { ExercisePreviewDto } from '../../exercises/dto/exercise-preview.dto';
 import { ModuleResponseDto } from '../../mods/dto/mods-response.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class LessonResponseDto {
+  @ApiProperty()
   id: number;
+  @ApiProperty()
   title: string;
+  @ApiProperty()
   description: string;
+  @ApiProperty()
   order: number;
+  @ApiProperty()
   duration: number;
+  @ApiProperty()
   videoUrl: string;
+  @ApiProperty({
+    type: [VocabularyItemDto],
+  })
   vocabulary: VocabularyItemDto[];
+  @ApiProperty()
   grammarNotes: string;
+  @ApiProperty()
   isActive: boolean;
+  @ApiProperty()
   mods: ModuleResponseDto;
+  @ApiProperty({
+    type: [ExercisePreviewDto],
+  })
   exercises: ExercisePreviewDto[];
+  @ApiProperty()
   progress?: number;
+  @ApiProperty()
   completed?: boolean;
+  @ApiProperty()
   exerciseCount: number;
+  @ApiProperty()
   totalPoints: number;
+  @ApiProperty()
   createdAt: Date;
 
   constructor(lesson: Lesson) {

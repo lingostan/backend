@@ -235,18 +235,6 @@ export class ExercisesService {
     };
   }
 
-  async getExerciseHints(exerciseId: number): Promise<string[]> {
-    const exercise = await this.exerciseRepository.findOne({
-      where: { id: exerciseId },
-    });
-
-    if (!exercise) {
-      throw new NotFoundException(`Exercise with ID ${exerciseId} not found`);
-    }
-
-    return exercise.hints || [];
-  }
-
   async getExerciseProgress(
     userId: string,
     exerciseId: number,

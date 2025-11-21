@@ -14,12 +14,51 @@ import { basename, extname, join } from 'path';
 import { existsSync } from 'fs';
 import { Response, Express } from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
 
 const uploadPath = join(__dirname, '..', '..', 'public', 'uploads');
 
+@ApiBearerAuth()
 @Controller('files')
 export class FilesController {
   @Post('upload')
+  @ApiOperation({
+    summary: 'Загрузка файла',
+    description:
+      'Загружает файл на сервер. Поддерживаемые форматы: изображения (JPG, JPEG, PNG, GIF) и аудио (MP3, WAV, MPEG)',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Файл для загрузки',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Файл для загрузки',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Файл успешно загружен',
+    schema: {
+      example: {
+        url: '/api/files/myimage-5423-123e4567-e89b-12d3-a456-426614174000.jpg',
+        filename: 'myimage-5423-123e4567-e89b-12d3-a456-426614174000.jpg',
+      },
+    },
+  })
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
@@ -54,6 +93,26 @@ export class FilesController {
   }
 
   @Get(':filename')
+  @ApiOperation({
+    summary: 'Получение файла',
+    description:
+      'Возвращает файл по имени. Поддерживаются русские имена файлов в URL-encoded формате',
+  })
+  @ApiParam({
+    name: 'filename',
+    type: String,
+    description: 'Имя файла',
+    example: 'myimage-5423-123e4567-e89b-12d3-a456-426614174000.jpg',
+    required: true,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Файл найден и возвращен',
+    schema: {
+      type: 'string',
+      format: 'binary',
+    },
+  })
   async serveFile(@Param('filename') filename: string, @Res() res: Response) {
     const decodedFilename = decodeURIComponent(filename);
 

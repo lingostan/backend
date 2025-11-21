@@ -20,18 +20,52 @@ import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { ExerciseType } from './entities/exercise.entity';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+} from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('learning/exercises')
 @UseGuards(JwtAuthGuard)
 export class ExercisesController {
   constructor(private readonly exercisesService: ExercisesService) {}
 
   @Put()
+  @ApiOperation({
+    summary: 'Создать упражнение',
+  })
+  @ApiBody({
+    type: CreateExerciseDto,
+  })
+  @ApiResponse({
+    status: 201,
+    type: ExerciseResponseDto,
+  })
   async createExercise(@Body() exercise: CreateExerciseDto) {
     return await this.exercisesService.createExercise(exercise);
   }
 
   @Patch(':id')
+  @ApiOperation({
+    summary: 'Обновить упражнение',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+  })
+  @ApiBody({
+    type: UpdateExerciseDto,
+  })
+  @ApiResponse({
+    status: 200,
+    type: ExerciseResponseDto,
+  })
   async updateExercise(
     @Param('id') id: number,
     @Body() updateExerciseDto: UpdateExerciseDto,
@@ -40,6 +74,24 @@ export class ExercisesController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'Получить все упражнения',
+  })
+  @ApiQuery({
+    name: 'languageId',
+    required: false,
+    type: Number,
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'type',
+    required: false,
+    enum: ExerciseType,
+  })
+  @ApiResponse({
+    status: 200,
+    type: [ExerciseResponseDto],
+  })
   async getAllExercises(
     @Query('languageId') languageId?: number,
     @Query('type') type?: ExerciseType,
@@ -48,6 +100,18 @@ export class ExercisesController {
   }
 
   @Get('lesson/:lessonId')
+  @ApiOperation({
+    summary: 'Получить упражнения по уроку с прогрессом',
+  })
+  @ApiParam({
+    name: 'lessonId',
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    type: [ExerciseResponseDto],
+  })
   async getExercisesByLesson(
     @CurrentUser() user: User,
     @Param('lessonId') lessonId: number,
@@ -60,6 +124,18 @@ export class ExercisesController {
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Получить упражнение по ID',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    type: ExerciseResponseDto,
+  })
   async getExercise(
     @CurrentUser() user: User,
     @Param('id') id: number,
@@ -72,6 +148,21 @@ export class ExercisesController {
   }
 
   @Post(':id/complete')
+  @ApiOperation({
+    summary: 'Завершить упражнение',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+  })
+  @ApiBody({
+    type: CompleteExerciseDto,
+  })
+  @ApiResponse({
+    status: 201,
+    type: ExerciseResultDto,
+  })
   async completeExercise(
     @CurrentUser() user: User,
     @Param('id') exerciseId: number,
@@ -85,16 +176,25 @@ export class ExercisesController {
     return new ExerciseResultDto(result);
   }
 
-  @Get(':id/hint')
-  async getHint(
-    @CurrentUser() user: User,
-    @Param('id') exerciseId: number,
-  ): Promise<{ hints: string[] }> {
-    const hints = await this.exercisesService.getExerciseHints(exerciseId);
-    return { hints };
-  }
-
   @Get(':id/progress')
+  @ApiOperation({
+    summary: 'Получить прогресс упражнения',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: {
+        completed: true,
+        score: 85,
+        attempts: 3,
+      },
+    },
+  })
   async getExerciseProgress(
     @CurrentUser() user: User,
     @Param('id') exerciseId: number,
@@ -103,6 +203,22 @@ export class ExercisesController {
   }
 
   @Delete(':id')
+  @ApiOperation({
+    summary: 'Удалить упражнение',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: {
+        message: 'Exercise deleted',
+      },
+    },
+  })
   async deleteExercise(@Param('id') id: number) {
     await this.exercisesService.deleteExercise(id);
 

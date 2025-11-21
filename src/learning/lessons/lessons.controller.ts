@@ -17,18 +17,52 @@ import { User } from '../../users/entities/user.entity';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+} from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('learning/lessons')
 @UseGuards(JwtAuthGuard)
 export class LessonsController {
   constructor(private readonly lessonsService: LessonsService) {}
 
   @Put()
+  @ApiOperation({
+    summary: 'Создать урок',
+  })
+  @ApiBody({
+    type: CreateLessonDto,
+  })
+  @ApiResponse({
+    status: 201,
+    type: LessonResponseDto,
+  })
   async createLesson(@Body() lesson: CreateLessonDto) {
     return await this.lessonsService.createLesson(lesson);
   }
 
   @Patch(':id')
+  @ApiOperation({
+    summary: 'Обновить урок',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+  })
+  @ApiBody({
+    type: UpdateLessonDto,
+  })
+  @ApiResponse({
+    status: 200,
+    type: LessonResponseDto,
+  })
   async updateLesson(
     @Param('id') id: number,
     @Body() updateLessonDto: UpdateLessonDto,
@@ -37,11 +71,36 @@ export class LessonsController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'Получить все уроки',
+  })
+  @ApiQuery({
+    name: 'moduleId',
+    required: false,
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    type: [LessonResponseDto],
+  })
   async getAllLessons(@Query('moduleId') moduleId?: number) {
     return await this.lessonsService.getAllLessons(moduleId);
   }
 
   @Get('module/:moduleId')
+  @ApiOperation({
+    summary: 'Получить уроки по модулю с прогрессом',
+  })
+  @ApiParam({
+    name: 'moduleId',
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    type: [LessonResponseDto],
+  })
   async getLessonsByModule(
     @CurrentUser() user: User,
     @Param('moduleId') moduleId: number,
@@ -54,6 +113,18 @@ export class LessonsController {
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Получить урок по ID',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    type: LessonResponseDto,
+  })
   async getLesson(
     @CurrentUser() user: User,
     @Param('id') id: number,
@@ -63,6 +134,22 @@ export class LessonsController {
   }
 
   @Post(':id/start')
+  @ApiOperation({
+    summary: 'Начать урок',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 201,
+    schema: {
+      example: {
+        started: true,
+      },
+    },
+  })
   async startLesson(
     @CurrentUser() user: User,
     @Param('id') lessonId: number,
@@ -71,6 +158,23 @@ export class LessonsController {
   }
 
   @Post(':id/complete')
+  @ApiOperation({
+    summary: 'Завершить урок',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 201,
+    schema: {
+      example: {
+        completed: true,
+        progress: 100,
+      },
+    },
+  })
   async completeLesson(
     @CurrentUser() user: User,
     @Param('id') lessonId: number,
@@ -79,6 +183,22 @@ export class LessonsController {
   }
 
   @Delete(':id')
+  @ApiOperation({
+    summary: 'Удалить урок',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: {
+        message: 'Lesson deleted successfully',
+      },
+    },
+  })
   async deleteLesson(@Param('id') id: string) {
     this.lessonsService.deleteLesson(id);
 
