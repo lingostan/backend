@@ -9,10 +9,17 @@ import { UsersModule } from '../../users/users.module';
 import { Mods } from '../mods/entities/mods.entity';
 import { Exercise } from '../exercises/entities/exercise.entity';
 import { ExercisesModule } from '../exercises/exercises.module';
+import { User } from '/users/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Lesson, UserLessonProgress, Mods, Exercise]),
+    TypeOrmModule.forFeature([
+      Lesson,
+      UserLessonProgress,
+      Mods,
+      Exercise,
+      User,
+    ]),
     ExercisesModule,
     UsersModule,
   ],

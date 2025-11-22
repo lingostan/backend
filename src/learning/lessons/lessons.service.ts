@@ -16,6 +16,8 @@ export class LessonsService {
   constructor(
     @InjectRepository(Mods)
     private readonly moduleRepository: Repository<Mods>,
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
     @InjectRepository(Lesson)
     private readonly lessonRepository: Repository<Lesson>,
     @InjectRepository(Exercise)
@@ -232,26 +234,28 @@ export class LessonsService {
     userId: string,
     lessonId: number,
   ): Promise<{ completed: boolean; progress: number }> {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+    });
     const lesson = await this.getLessonWithProgress(userId, lessonId);
     let progress = await this.getUserLessonProgress(userId, lessonId);
 
     // Рассчитываем прогресс на основе завершенных упражнений
-    const exerciseProgress =
-      await this.exercisesService.calculateLessonProgress(userId, lessonId);
+    // const exerciseProgress =
+    //   await this.exercisesService.calculateLessonProgress(userId, lessonId);
 
     if (!progress) {
       progress = this.userLessonProgressRepository.create({
-        user: { id: userId } as User,
-        lesson: { id: lessonId } as Lesson,
-        progress: exerciseProgress.percentage,
-        completed: exerciseProgress.percentage === 100,
-        completedAt: exerciseProgress.percentage === 100 ? new Date() : null,
+        user: user,
+        lesson: lesson,
+        progress: 100,
+        completed: true,
+        completedAt: new Date(),
       });
     } else {
-      progress.progress = exerciseProgress.percentage;
-      progress.completed = exerciseProgress.percentage === 100;
-      progress.completedAt =
-        exerciseProgress.percentage === 100 ? new Date() : null;
+      progress.progress = 100;
+      progress.completed = true;
+      progress.completedAt = new Date();
     }
 
     await this.userLessonProgressRepository.save(progress);
