@@ -96,7 +96,11 @@ export class ExercisesController {
     @Query('languageId') languageId?: number,
     @Query('type') type?: ExerciseType,
   ) {
-    return await this.exercisesService.getAllExercises(languageId, type);
+    const exercises = await this.exercisesService.getAllExercises(
+      languageId,
+      type,
+    );
+    return exercises.map((exercise) => new ExerciseResponseDto(exercise));
   }
 
   @Get('lesson/:lessonId')

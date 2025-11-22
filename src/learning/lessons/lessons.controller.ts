@@ -85,7 +85,9 @@ export class LessonsController {
     type: [LessonResponseDto],
   })
   async getAllLessons(@Query('moduleId') moduleId?: number) {
-    return await this.lessonsService.getAllLessons(moduleId);
+    const lessons = await this.lessonsService.getAllLessons(moduleId);
+
+    return lessons.map((lesson) => new LessonResponseDto(lesson));
   }
 
   @Get('module/:moduleId')

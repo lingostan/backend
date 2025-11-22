@@ -30,13 +30,6 @@ export class LanguageResponseDto {
     type: [AlphabetItemDto],
   })
   alphabet: AlphabetItemDto[];
-  @ApiProperty({
-    type: 'array',
-    items: {
-      type: 'object',
-    },
-  })
-  mods: Mods[];
 
   constructor(language: Language) {
     this.id = language.id;
@@ -51,6 +44,5 @@ export class LanguageResponseDto {
     this.totalExercises = language.totalExercises;
     this.createdAt = language.createdAt;
     this.alphabet = language.alphabet;
-    this.mods = language.mods;
   }
 }

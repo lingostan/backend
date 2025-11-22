@@ -1,5 +1,4 @@
 import { Exercise, ExerciseType } from '../entities/exercise.entity';
-import { LessonPreviewDto } from '../../lessons/dto/lesson-preview.dto';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ExerciseResponseDto {
@@ -24,7 +23,7 @@ export class ExerciseResponseDto {
   @ApiProperty()
   isActive: boolean;
   @ApiProperty()
-  lesson: LessonPreviewDto;
+  lessonId: number;
   @ApiProperty()
   completed?: boolean;
   @ApiProperty()
@@ -45,7 +44,7 @@ export class ExerciseResponseDto {
     this.hints = exercise.hints;
     this.explanation = exercise.explanation;
     this.isActive = exercise.isActive;
-    this.lesson = new LessonPreviewDto(exercise.lesson);
+    this.lessonId = exercise.lesson.id;
     this.createdAt = exercise.createdAt;
 
     if (exercise.userProgress && exercise.userProgress.length > 0) {

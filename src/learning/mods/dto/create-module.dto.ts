@@ -54,6 +54,6 @@ export class CreateModuleDto {
   @IsOptional()
   @IsArray()
   @IsNumber({}, { each: true })
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, type: [Number] })
   lessonIds?: number[];
 }

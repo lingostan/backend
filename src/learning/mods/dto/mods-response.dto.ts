@@ -24,21 +24,16 @@ export class ModuleResponseDto {
   totalExercises: number;
   @ApiProperty()
   isActive: boolean;
-  @ApiProperty({
-    type: LanguageResponseDto,
-  })
-  language: LanguageResponseDto;
+  @ApiProperty()
+  language: number;
   @ApiProperty()
   progress?: number;
   @ApiProperty()
   completed?: boolean;
   @ApiProperty({
-    type: 'array',
-    items: {
-      type: 'object',
-    },
+    type: [Number],
   })
-  lessons?: LessonPreviewDto[];
+  lessons?: number[];
   @ApiProperty()
   createdAt: Date;
 
@@ -53,7 +48,7 @@ export class ModuleResponseDto {
     this.totalLessons = mods.totalLessons;
     this.totalExercises = mods.totalExercises;
     this.isActive = mods.isActive;
-    this.language = new LanguageResponseDto(mods.language);
+    this.language = mods.language.id;
     this.createdAt = mods.createdAt;
 
     if (mods.userProgress && mods.userProgress.length > 0) {
@@ -63,7 +58,7 @@ export class ModuleResponseDto {
     }
 
     if (mods.lessons) {
-      this.lessons = mods.lessons.map((lesson) => new LessonPreviewDto(lesson));
+      this.lessons = mods.lessons.map(({ id }) => id);
     }
   }
 }

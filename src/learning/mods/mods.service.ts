@@ -32,7 +32,7 @@ export class ModsService {
 
     return await this.moduleRepository.find({
       where,
-      relations: ['lessons'],
+      relations: ['lessons', 'language'],
     });
   }
 

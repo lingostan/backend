@@ -84,7 +84,8 @@ export class ModsController {
     type: [ModuleResponseDto],
   })
   async getAllModules(@Query('languageId') languageId?: number) {
-    return await this.modulesService.getAllModules(languageId);
+    const modules = await this.modulesService.getAllModules(languageId);
+    return modules.map((module) => new ModuleResponseDto(module));
   }
 
   @Get('language/:languageId')

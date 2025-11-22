@@ -26,11 +26,11 @@ export class LessonResponseDto {
   @ApiProperty()
   isActive: boolean;
   @ApiProperty()
-  mods: ModuleResponseDto;
+  modsId: number;
   @ApiProperty({
-    type: [ExercisePreviewDto],
+    type: [Number],
   })
-  exercises: ExercisePreviewDto[];
+  exercises: number[];
   @ApiProperty()
   progress?: number;
   @ApiProperty()
@@ -53,14 +53,14 @@ export class LessonResponseDto {
       lesson.vocabulary?.map((item) => new VocabularyItemDto(item)) || [];
     this.grammarNotes = lesson.grammarNotes;
     this.isActive = lesson.isActive;
-    this.mods = new ModuleResponseDto(lesson.mods);
+    this.modsId = lesson.mods?.id || 0;
     this.exerciseCount = lesson.exercises?.length || 0;
     this.totalPoints =
       lesson.exercises?.reduce((total, ex) => total + ex.points, 0) || 0;
     this.createdAt = lesson.createdAt;
 
     if (lesson.exercises) {
-      this.exercises = lesson.exercises.map((ex) => new ExercisePreviewDto(ex));
+      this.exercises = lesson.exercises.map((ex) => ex.id);
     }
 
     if (lesson.userProgress && lesson.userProgress.length > 0) {
