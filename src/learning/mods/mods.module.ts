@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Mods } from './entities/mods.entity';
@@ -14,7 +14,7 @@ import { Language } from '/language/entities/language.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Mods, UserModuleProgress, Lesson, Language]),
-    LessonsModule,
+    forwardRef(() => LessonsModule),
     UsersModule,
   ],
   controllers: [ModsController],

@@ -10,6 +10,8 @@ import { Mods } from '../mods/entities/mods.entity';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { Exercise } from '../exercises/entities/exercise.entity';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
+import { UserModuleProgress } from '../progress/entities/user-module-progress.entity';
+import { ModsService } from '../mods/mods.service';
 
 @Injectable()
 export class LessonsService {
@@ -24,7 +26,10 @@ export class LessonsService {
     private readonly exerciseRepository: Repository<Exercise>,
     @InjectRepository(UserLessonProgress)
     private readonly userLessonProgressRepository: Repository<UserLessonProgress>,
+    @InjectRepository(UserModuleProgress)
+    private readonly userModuleProgressRepository: Repository<UserModuleProgress>,
     private readonly exercisesService: ExercisesService,
+    private readonly modsService: ModsService,
   ) {}
 
   async getAllLessons(moduleId?: number): Promise<Lesson[]> {
@@ -240,10 +245,6 @@ export class LessonsService {
     const lesson = await this.getLessonWithProgress(userId, lessonId);
     let progress = await this.getUserLessonProgress(userId, lessonId);
 
-    // Рассчитываем прогресс на основе завершенных упражнений
-    // const exerciseProgress =
-    //   await this.exercisesService.calculateLessonProgress(userId, lessonId);
-
     if (!progress) {
       progress = this.userLessonProgressRepository.create({
         user: user,
@@ -260,10 +261,56 @@ export class LessonsService {
 
     await this.userLessonProgressRepository.save(progress);
 
+    await this.updateModuleProgress(user, lesson.mods.id);
+
     return {
       completed: progress.completed,
       progress: progress.progress,
     };
+  }
+
+  private async updateModuleProgress(
+    user: User,
+    moduleId: number,
+  ): Promise<void> {
+    const lessons = await this.getLessonsWithProgress(user.id, moduleId);
+
+    const completedLessons = lessons.filter(
+      (lesson) => lesson.userProgress[0].completed,
+    ).length;
+
+    const module = await this.modsService.getModuleWithProgress(
+      user.id,
+      moduleId,
+    );
+    const moduleProgressPercentage =
+      lessons.length > 0
+        ? Math.round((completedLessons / lessons.length) * 100)
+        : 0;
+
+    let moduleProgress = await this.userModuleProgressRepository.findOne({
+      where: {
+        user: { id: user.id },
+        mods: { id: moduleId },
+      },
+    });
+
+    if (!moduleProgress) {
+      moduleProgress = this.userModuleProgressRepository.create({
+        user: user,
+        mods: module,
+        progress: moduleProgressPercentage,
+        completed: moduleProgressPercentage === 100,
+        completedAt: moduleProgressPercentage === 100 ? new Date() : null,
+      });
+    } else {
+      moduleProgress.progress = moduleProgressPercentage;
+      moduleProgress.completed = moduleProgressPercentage === 100;
+      moduleProgress.completedAt =
+        moduleProgressPercentage === 100 ? new Date() : null;
+    }
+
+    await this.userModuleProgressRepository.save(moduleProgress);
   }
 
   async calculateLessonProgress(

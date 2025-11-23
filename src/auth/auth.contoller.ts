@@ -67,7 +67,8 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
-      domain: '.gilaniel.ru', // явно указать домен
+      domain:
+        process.env.NODE_ENV === 'production' ? '.gilaniel.ru' : 'localhost', // явно указать домен
       path: '/',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
@@ -103,7 +104,8 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
-      domain: '.gilaniel.ru', // явно указать домен
+      domain:
+        process.env.NODE_ENV === 'production' ? '.gilaniel.ru' : 'localhost', // явно указать домен
       path: '/',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
@@ -165,7 +167,8 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
-      domain: '.gilaniel.ru', // явно указать домен
+      domain:
+        process.env.NODE_ENV === 'production' ? '.gilaniel.ru' : 'localhost', // явно указать домен
       path: '/',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
@@ -196,7 +199,8 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
-      domain: '.gilaniel.ru', // явно указать домен
+      domain:
+        process.env.NODE_ENV === 'production' ? '.gilaniel.ru' : 'localhost', // явно указать домен
       path: '/',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });

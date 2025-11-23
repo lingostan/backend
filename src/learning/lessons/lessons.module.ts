@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { LessonsService } from './lessons.service';
@@ -10,18 +10,22 @@ import { Mods } from '../mods/entities/mods.entity';
 import { Exercise } from '../exercises/entities/exercise.entity';
 import { ExercisesModule } from '../exercises/exercises.module';
 import { User } from '/users/entities/user.entity';
+import { UserModuleProgress } from '../progress/entities/user-module-progress.entity';
+import { ModsModule } from '../mods/mods.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Lesson,
       UserLessonProgress,
+      UserModuleProgress,
       Mods,
       Exercise,
       User,
     ]),
     ExercisesModule,
     UsersModule,
+    forwardRef(() => ModsModule),
   ],
   controllers: [LessonsController],
   providers: [LessonsService],

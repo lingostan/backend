@@ -53,7 +53,7 @@ export class ModuleResponseDto {
 
     if (mods.userProgress && mods.userProgress.length > 0) {
       const progress = mods.userProgress[0];
-      this.progress = progress.progress;
+      this.progress = parseFloat(String(progress.progress));
       this.completed = progress.completed;
     }
 

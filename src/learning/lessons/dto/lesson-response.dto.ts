@@ -65,7 +65,7 @@ export class LessonResponseDto {
 
     if (lesson.userProgress && lesson.userProgress.length > 0) {
       const progress = lesson.userProgress[0];
-      this.progress = progress.progress;
+      this.progress = parseFloat(String(progress.progress));
       this.completed = progress.completed;
     }
   }
