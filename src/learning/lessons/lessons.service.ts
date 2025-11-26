@@ -62,8 +62,6 @@ export class LessonsService {
       where: { id: createLessonDto.languageId },
     });
 
-    console.log(lang);
-
     lessonData.language = lang;
 
     if (!module) {
@@ -111,6 +109,12 @@ export class LessonsService {
 
     const updateData: any = { ...updateLessonDto };
 
+    const lang = await this.languageRepository.findOne({
+      where: { id: updateData.languageId },
+    });
+
+    updateData.language = lang;
+
     if (updateLessonDto.moduleId) {
       const module = await this.moduleRepository.findOne({
         where: { id: updateLessonDto.moduleId },
@@ -133,6 +137,7 @@ export class LessonsService {
       }
     }
 
+    delete updateData.languageId;
     delete updateData.moduleId;
     delete updateData.exerciseIds;
     delete updateData.exercises;

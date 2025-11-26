@@ -26,7 +26,7 @@ export class LessonResponseDto {
   @ApiProperty()
   isActive: boolean;
   @ApiProperty()
-  modsId: number;
+  moduleId: number;
   @ApiProperty({
     type: [Number],
   })
@@ -53,7 +53,7 @@ export class LessonResponseDto {
       lesson.vocabulary?.map((item) => new VocabularyItemDto(item)) || [];
     this.grammarNotes = lesson.grammarNotes;
     this.isActive = lesson.isActive;
-    this.modsId = lesson.mods?.id || 0;
+    this.moduleId = lesson.mods?.id || 0;
     this.exerciseCount = lesson.exercises?.length || 0;
     this.totalPoints =
       lesson.exercises?.reduce((total, ex) => total + ex.points, 0) || 0;
