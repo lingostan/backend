@@ -177,7 +177,10 @@ export class LanguageService {
 
     const currentVocabulary = language.vocabulary || [];
 
-    language.vocabulary = [...currentVocabulary, vocabularyDto];
+    language.vocabulary = [
+      ...currentVocabulary.filter((item) => item.word !== vocabularyDto.word),
+      vocabularyDto,
+    ];
 
     return this.languageRepository.save(language);
   }
