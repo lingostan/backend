@@ -120,7 +120,7 @@ export class FilesController {
     const decodedFilename = decodeURIComponent(filename);
 
     if (
-      !/^[a-zA-Zа-яА-Я0-9\s\-_\.«»()–%]+\.(mp3|wav|jpg|jpeg|png|gif)$/i.test(
+      !/^[a-zA-Zа-яА-Я0-9\s\-\_\.\(\)\–\%\«\»]+\.(mp3|wav|jpg|jpeg|png|gif)$/i.test(
         decodedFilename,
       )
     ) {
