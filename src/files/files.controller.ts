@@ -80,6 +80,9 @@ export class FilesController {
         }
         cb(null, true);
       },
+      limits: {
+        fileSize: 50 * 1024 * 1024,
+      },
     }),
   )
   uploadFile(@UploadedFile() file: Express.Multer.File) {
