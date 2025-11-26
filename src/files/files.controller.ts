@@ -117,14 +117,14 @@ export class FilesController {
     },
   })
   async serveFile(@Param('filename') filename: string, @Res() res: Response) {
-    const decodedFilename = decodeURIComponent(filename);
+    const decodedFilename = decodeURIComponent(filename).normalize('NFC');
 
     if (
       !/^[\p{L}\p{N}\s\-_\.\(\)%«»]+\.(mp3|wav|jpg|jpeg|png|gif)$/iu.test(
         decodedFilename,
       )
     ) {
-      throw new NotFoundException('Недопустимое имя файла пожуй говна');
+      throw new NotFoundException('Недопустимое имя файла');
     }
 
     const filePath = join(uploadPath, decodedFilename);
