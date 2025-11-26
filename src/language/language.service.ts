@@ -180,7 +180,7 @@ export class LanguageService {
     language.vocabulary = [
       ...currentVocabulary.filter((item) => item.word !== vocabularyDto.word),
       vocabularyDto,
-    ].sort((a, b) => a.word.toLowerCase().localeCompare(b.word.toLowerCase()));
+    ];
 
     return this.languageRepository.save(language);
   }
