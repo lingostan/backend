@@ -124,7 +124,7 @@ export class FilesController {
         decodedFilename,
       )
     ) {
-      throw new NotFoundException('Недопустимое имя файла');
+      throw new NotFoundException('Недопустимое имя файла пожуй говна');
     }
 
     const filePath = join(uploadPath, decodedFilename);
