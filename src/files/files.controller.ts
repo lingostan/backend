@@ -117,10 +117,10 @@ export class FilesController {
     },
   })
   async serveFile(@Param('filename') filename: string, @Res() res: Response) {
-    const decodedFilename = decodeURIComponent(filename).normalize('NFC');
+    const decodedFilename = decodeURIComponent(filename);
 
     if (
-      !/^[\p{L}\p{N}\s\-_\.\(\)%«»]+\.(mp3|wav|jpg|jpeg|png|gif)$/iu.test(
+      !/^[a-zA-Zа-яА-Я0-9\s\-_\.«»()–]+\.(mp3|wav|jpg|jpeg|png|gif)$/i.test(
         decodedFilename,
       )
     ) {
