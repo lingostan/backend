@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Mods } from '../../learning/mods/entities/mods.entity';
 import { AlphabetItem } from './alphabet-item.entity';
+import { VocabularyItem } from '/learning/lessons/entities/lesson.entity';
 
 @Entity()
 export class Language {
@@ -47,6 +48,9 @@ export class Language {
 
   @OneToMany(() => Mods, (module) => module.language)
   mods: Mods[];
+
+  @Column({ type: 'jsonb', nullable: true })
+  vocabulary: VocabularyItem[];
 
   @CreateDateColumn()
   createdAt: Date;

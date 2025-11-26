@@ -24,6 +24,8 @@ import {
   ApiQuery,
   ApiResponse,
 } from '@nestjs/swagger';
+import { VocabularyItemDto } from '/learning/lessons/dto/vocabulary-item.dto';
+import { VocabularyItem } from '/learning/lessons/entities/lesson.entity';
 
 @ApiBearerAuth()
 @Controller('languages')
@@ -109,6 +111,38 @@ export class LanguageController {
     const language =
       await this.languageService.createLanguage(createLanguageDto);
     return new LanguageResponseDto(language);
+  }
+
+  @Get(':id/vocabulary')
+  async getVocabulary(@Param('id') id: number) {
+    const lang = await this.languageService.getVocabulary(id);
+
+    return lang.vocabulary
+      ? lang.vocabulary.map((item) => new VocabularyItemDto(item))
+      : [];
+  }
+
+  @Post(':id/vocabulary')
+  async updateVocabulary(
+    @Param('id') id: number,
+    @Body() vocabularyDto: VocabularyItem,
+  ) {
+    const vocabulary = await this.languageService.updateVocabulary(
+      id,
+      vocabularyDto,
+    );
+
+    return vocabulary;
+  }
+
+  @Delete(':id/vocabulary')
+  async deleteVocabularyByWord(
+    @Param('id') id: number,
+    @Body() { word }: { word: string },
+  ) {
+    await this.languageService.removeVocabularyByWord(id, word);
+
+    return { message: 'Vocabulary item deleted' };
   }
 
   // @Post(':id/start')

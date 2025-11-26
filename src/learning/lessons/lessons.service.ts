@@ -12,6 +12,7 @@ import { Exercise } from '../exercises/entities/exercise.entity';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { UserModuleProgress } from '../progress/entities/user-module-progress.entity';
 import { ModsService } from '../mods/mods.service';
+import { Language } from '/language/entities/language.entity';
 
 @Injectable()
 export class LessonsService {
@@ -24,6 +25,8 @@ export class LessonsService {
     private readonly lessonRepository: Repository<Lesson>,
     @InjectRepository(Exercise)
     private readonly exerciseRepository: Repository<Exercise>,
+    @InjectRepository(Language)
+    private readonly languageRepository: Repository<Language>,
     @InjectRepository(UserLessonProgress)
     private readonly userLessonProgressRepository: Repository<UserLessonProgress>,
     @InjectRepository(UserModuleProgress)
@@ -32,11 +35,11 @@ export class LessonsService {
     private readonly modsService: ModsService,
   ) {}
 
-  async getAllLessons(moduleId?: number): Promise<Lesson[]> {
+  async getAllLessons(languageId?: number): Promise<Lesson[]> {
     const where: any = {};
 
-    if (moduleId) {
-      where.mods = { id: moduleId };
+    if (languageId) {
+      where.language = { id: languageId };
     }
 
     return await this.lessonRepository.find({
@@ -55,6 +58,14 @@ export class LessonsService {
       where: { id: createLessonDto.moduleId },
     });
 
+    const lang = await this.languageRepository.findOne({
+      where: { id: createLessonDto.languageId },
+    });
+
+    console.log(lang);
+
+    lessonData.language = lang;
+
     if (!module) {
       throw new NotFoundException(
         `Module with ID ${createLessonDto.moduleId} not found`,
@@ -63,6 +74,7 @@ export class LessonsService {
 
     lessonData.mods = module;
 
+    delete lessonData.languageId;
     delete lessonData.moduleId;
     delete lessonData.exerciseIds;
 
@@ -98,8 +110,6 @@ export class LessonsService {
     }
 
     const updateData: any = { ...updateLessonDto };
-
-    console.log(updateData);
 
     if (updateLessonDto.moduleId) {
       const module = await this.moduleRepository.findOne({
@@ -339,6 +349,13 @@ export class LessonsService {
     await this.exerciseRepository
       .createQueryBuilder()
       .update(Exercise)
+      .set({ lesson: null })
+      .where('lessonId = :lessonId', { lessonId })
+      .execute();
+
+    await this.userLessonProgressRepository
+      .createQueryBuilder()
+      .update(UserLessonProgress)
       .set({ lesson: null })
       .where('lessonId = :lessonId', { lessonId })
       .execute();

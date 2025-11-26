@@ -75,7 +75,7 @@ export class LessonsController {
     summary: 'Получить все уроки',
   })
   @ApiQuery({
-    name: 'moduleId',
+    name: 'languageId',
     required: false,
     type: Number,
     example: 1,
@@ -84,8 +84,8 @@ export class LessonsController {
     status: 200,
     type: [LessonResponseDto],
   })
-  async getAllLessons(@Query('moduleId') moduleId?: number) {
-    const lessons = await this.lessonsService.getAllLessons(moduleId);
+  async getAllLessons(@Query('languageId') languageId?: number) {
+    const lessons = await this.lessonsService.getAllLessons(languageId);
 
     return lessons.map((lesson) => new LessonResponseDto(lesson));
   }

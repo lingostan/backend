@@ -17,6 +17,7 @@ import {
   UpdateAlphabetItemDto,
   UpdateLanguageDto,
 } from './dto/update-language.dto';
+import { VocabularyItemDto } from '/learning/lessons/dto/vocabulary-item.dto';
 
 @Injectable()
 export class LanguageService {
@@ -156,6 +157,43 @@ export class LanguageService {
     });
 
     return this.alphabetItemRepository.save(item);
+  }
+
+  async getVocabulary(id: number): Promise<Language> {
+    const language = await this.languageRepository.findOne({
+      where: { id },
+    });
+
+    return language;
+  }
+
+  async updateVocabulary(
+    id: number,
+    vocabularyDto: VocabularyItemDto,
+  ): Promise<Language> {
+    const language = await this.languageRepository.findOne({
+      where: { id },
+    });
+
+    const currentVocabulary = language.vocabulary || [];
+
+    language.vocabulary = [...currentVocabulary, vocabularyDto];
+
+    return this.languageRepository.save(language);
+  }
+
+  async removeVocabularyByWord(id: number, word: string): Promise<Language> {
+    const language = await this.languageRepository.findOne({
+      where: { id },
+    });
+
+    const currentVocabulary = language.vocabulary || [];
+
+    language.vocabulary = currentVocabulary.filter(
+      (item) => item.word !== word,
+    );
+
+    return this.languageRepository.save(language);
   }
 
   async removeAlphabetItem(alphabetItemId: number): Promise<void> {

@@ -16,7 +16,11 @@ export class UserLessonProgress {
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => Lesson, { eager: true })
+  @ManyToOne(() => Lesson, {
+    eager: true,
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   lesson: Lesson;
 
   @Column({ default: false })

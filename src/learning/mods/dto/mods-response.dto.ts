@@ -1,6 +1,4 @@
 import { Mods } from '../entities/mods.entity';
-import { LanguageResponseDto } from '../../../language/dto/language-response.dto';
-import { LessonPreviewDto } from '../../lessons/dto/lesson-preview.dto';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ModuleResponseDto {

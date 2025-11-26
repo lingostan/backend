@@ -48,6 +48,10 @@ export class CreateLessonDto {
   @ApiProperty()
   moduleId: number;
 
+  @IsNumber()
+  @ApiProperty()
+  languageId: number;
+
   @IsOptional()
   @IsArray()
   @IsNumber({}, { each: true })

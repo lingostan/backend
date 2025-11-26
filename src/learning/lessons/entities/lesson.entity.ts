@@ -9,6 +9,7 @@ import {
 import { Exercise } from '../../exercises/entities/exercise.entity';
 import { UserLessonProgress } from '../../progress/entities/user-lesson-progress.entity';
 import { Mods } from '../../mods/entities/mods.entity';
+import { Language } from '../../../language/entities/language.entity';
 
 @Entity()
 export class Lesson {
@@ -42,6 +43,9 @@ export class Lesson {
   @ManyToOne(() => Mods, (mods) => mods.lessons)
   mods: Mods;
 
+  @ManyToOne(() => Language, (language) => language.mods)
+  language: Language;
+
   @OneToMany(() => Exercise, (exercise) => exercise.lesson)
   exercises: Exercise[];
 
@@ -65,10 +69,7 @@ export class Lesson {
 
 export interface VocabularyItem {
   word: string;
-  translation: string;
-  pronunciation: string;
+  translation?: string;
   audioUrl: string;
   imageUrl: string;
-  partOfSpeech: string;
-  example: string;
 }

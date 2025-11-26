@@ -12,6 +12,7 @@ import { ExercisesModule } from '../exercises/exercises.module';
 import { User } from '/users/entities/user.entity';
 import { UserModuleProgress } from '../progress/entities/user-module-progress.entity';
 import { ModsModule } from '../mods/mods.module';
+import { Language } from '/language/entities/language.entity';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ModsModule } from '../mods/mods.module';
       Mods,
       Exercise,
       User,
+      Language,
     ]),
     ExercisesModule,
     UsersModule,
