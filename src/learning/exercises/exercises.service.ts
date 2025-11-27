@@ -79,8 +79,6 @@ export class ExercisesService {
     id: number,
     updateExerciseDto: UpdateExerciseDto,
   ): Promise<Exercise> {
-    await this.exerciseRepository.delete(3);
-
     const exercise = await this.exerciseRepository.findOne({
       where: { id },
       relations: ['language', 'lesson'],
