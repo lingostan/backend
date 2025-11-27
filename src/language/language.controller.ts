@@ -135,6 +135,11 @@ export class LanguageController {
     return vocabulary;
   }
 
+  @Get(':id/alphabet')
+  async getAlphabet(@Param('id') id: number) {
+    return await this.languageService.getAlphabet(id);
+  }
+
   @Delete(':id/vocabulary')
   async deleteVocabularyByWord(
     @Param('id') id: number,
