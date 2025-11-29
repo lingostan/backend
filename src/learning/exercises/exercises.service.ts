@@ -42,6 +42,7 @@ export class ExercisesService {
     return await this.exerciseRepository.find({
       where,
       relations: ['lesson'],
+      order: { order: 'ASC' },
     });
   }
 

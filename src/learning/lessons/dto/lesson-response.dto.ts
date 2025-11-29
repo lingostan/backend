@@ -30,7 +30,7 @@ export class LessonResponseDto {
   @ApiProperty({
     type: [Number],
   })
-  exercises: number[];
+  exerciseIds: number[];
   @ApiProperty()
   progress?: number;
   @ApiProperty()
@@ -60,7 +60,7 @@ export class LessonResponseDto {
     this.createdAt = lesson.createdAt;
 
     if (lesson.exercises) {
-      this.exercises = lesson.exercises.map((ex) => ex.id);
+      this.exerciseIds = lesson.exercises.map((ex) => ex.id);
     }
 
     if (lesson.userProgress && lesson.userProgress.length > 0) {
