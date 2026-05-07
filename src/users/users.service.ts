@@ -29,6 +29,8 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
+
+    //TODO какая то шляпа, в ДТО этого нет, но по факту языки попадают сюда и ормка захлебывается 
     delete updateUserDto['languages'] 
 
     await this.usersRepository.update(id, updateUserDto);
