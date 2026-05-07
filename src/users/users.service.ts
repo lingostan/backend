@@ -29,7 +29,9 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    await this.usersRepository.update(id, updateUserDto);
+    const { languages, ...rest } = updateUserDto
+
+    await this.usersRepository.update(id, updateUserDto: rest );
 
     return this.usersRepository.findOne({ where: { id } });
   }
