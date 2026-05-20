@@ -1,0 +1,66 @@
+# Timeweb App Platform — стенд / автодеплой из Git
+# Документация: docs/DEPLOY-TIMEWEB.md
+#
+# Ограничения Timeweb:
+# - этот файл должен называться docker-compose.yml и лежать в корне репозитория
+# - нельзя использовать volumes (данные БД и uploads не сохраняются между деплоями)
+# - прокси на домен вешается на ПЕРВЫЙ сервис — backend должен быть первым
+# - порты 80 и 443 на хосте запрещены
+#
+# Локальная разработка: compose.yml
+# VPS с постоянными volumes: compose.prod.yml
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:3000/api', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped

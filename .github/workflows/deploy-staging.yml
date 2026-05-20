@@ -1,0 +1,39 @@
+# Деплой стенда на сервер Timeweb (VPS) по SSH
+# Секреты: Settings → Secrets and variables → Actions
+
+name: Deploy staging
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy to server
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.2
+        env:
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          BRANCH: ${{ github.ref_name }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          envs: DEPLOY_PATH,BRANCH
+          script_stop: true
+          command_timeout: 30m
+          script: |
+            set -e
+            cd "$DEPLOY_PATH"
+            bash scripts/deploy.sh

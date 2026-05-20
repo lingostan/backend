@@ -1,0 +1,71 @@
+# Development: Nest (watch) + Postgres
+# Запуск: docker compose up --build
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: lingostan-postgres-dev
+    # Порт на хосте — для DBeaver/psql; внутри сети Postgres всегда на 5432
+    ports:
+      - '${POSTGRES_PUBLISH_PORT:-5432}:5432'
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    networks:
+      - app-network
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-lingostan}
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development # стадия development из Dockerfile
+    container_name: lingostan-backend-dev
+    depends_on:
+      postgres:
+        condition: service_healthy # старт после готовности БД
+    ports:
+      - '${PORT:-3000}:3000'
+    networks:
+      - app-network
+    env_file:
+      - ./.env
+    environment:
+      NODE_ENV: development
+      # Подключение к Postgres по имени сервиса в Docker-сети
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    volumes:
+      # Hot-reload: код и конфиги с хоста
+      - ./src:/usr/src/app/src
+      - ./public:/usr/src/app/public
+      - ./package.json:/usr/src/app/package.json
+      - ./package-lock.json:/usr/src/app/package-lock.json
+      - ./tsconfig.json:/usr/src/app/tsconfig.json
+      - ./tsconfig.build.json:/usr/src/app/tsconfig.build.json
+      - ./nest-cli.json:/usr/src/app/nest-cli.json
+      # node_modules отдельно от хоста (избегаем конфликтов ОС)
+      - backend_node_modules:/usr/src/app/node_modules
+    restart: unless-stopped
+
+volumes:
+  pgdata_dev: # данные Postgres (dev)
+  backend_node_modules:
+
+networks:
+  app-network:
+    driver: bridge
