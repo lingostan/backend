@@ -8,7 +8,8 @@ type DataSourceTypes = DataSourceOptions & {
   };
 };
 
-config();
+// Локально — из .env; в Docker — env_file + mount .env (см. compose.prod.yml)
+config({ override: false });
 
 const MigrationOrmSource = new DataSource({
   type: 'postgres',

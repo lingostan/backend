@@ -115,6 +115,7 @@ docker compose up backend
 |----------|---------|
 | Порт 3000 или 5432 занят | В `.env` смените `PORT` или `POSTGRES_PUBLISH_PORT` |
 | Backend не видит Postgres | Не ставьте `POSTGRES_HOST=localhost` для запуска через Docker |
+| `password authentication failed` | Пароль в `.env` ≠ пароль при первом создании volume Postgres; см. [DEPLOY-GITHUB-ACTIONS.md](./docs/DEPLOY-GITHUB-ACTIONS.md) |
 | После `npm install` на компьютере всё ломается в dev | `docker compose build --no-cache backend` |
 
 ---

@@ -71,3 +71,27 @@ API: `http://<IP>:3000/api`
 | `git fetch` failed | Deploy key на сервере для доступа к GitHub |
 | `no such file .env` | Создайте `.env` в каталоге `DEPLOY_PATH` |
 | Порт занят | Смените `PORT` в `.env` |
+| `password authentication failed for user "postgres"` | Пароль в `.env` не совпадает с тем, что записан в volume Postgres при первом запуске. См. ниже |
+
+### Ошибка `password authentication failed`
+
+Postgres запоминает пароль **только при первом создании** volume. Если потом поменять `POSTGRES_PASSWORD` в `.env`, backend подключается с новым паролем, а база — со старым.
+
+**Вариант А** — подогнать `.env` под уже существующую БД (вспомнить старый пароль).
+
+**Вариант Б** — пересоздать БД (данные удалятся):
+
+```bash
+cd $DEPLOY_PATH
+docker compose -f compose.prod.yml down
+docker volume ls | grep pgdata   # например backend_pgdata
+docker volume rm backend_pgdata  # имя из вывода
+# в .env задайте финальный POSTGRES_PASSWORD
+docker compose -f compose.prod.yml up -d --build
+```
+
+Проверка, что backend видит те же переменные:
+
+```bash
+docker compose -f compose.prod.yml exec backend env | grep POSTGRES
+```

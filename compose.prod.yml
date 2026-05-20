@@ -11,12 +11,9 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - app-network
+    # Креды БД — из .env на сервере (POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB)
     env_file:
       - ./.env
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-lingostan}
     healthcheck:
       test:
         [
@@ -46,9 +43,11 @@ services:
       - ./.env
     environment:
       NODE_ENV: production
+      # В .env часто POSTGRES_HOST=0.0.0.0 — внутри Docker-сети нужен сервис postgres
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
     volumes:
+      - ./.env:/usr/src/app/.env:ro
       # Загрузки пользователей сохраняются между деплоями (не в образе)
       - uploads_data:/usr/src/app/public/uploads
     restart: unless-stopped
