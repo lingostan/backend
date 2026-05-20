@@ -1,49 +1,75 @@
-version: '3.8'
+# Production: собранный Nest + Postgres
+# Запуск: docker compose -f compose.prod.yml up -d --build
 
 services:
   postgres:
-    image: postgres:15
-    container_name: nest-postgres
+    image: postgres:15-alpine
+    container_name: lingostan-postgres
     ports:
-      - '${POSTGRES_PORT}:5432'
+      - '${POSTGRES_PUBLISH_PORT:-5432}:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-      - app-network-prod
+      - app-network
     env_file:
       - ./.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-lingostan}
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}',
+        ]
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 10s
+    restart: unless-stopped
 
   backend:
-    build: .
-    container_name: nest-backend
-    command: sh -c "npm run start:dev"
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production # стадия production: dist/ + start:prod
+    container_name: lingostan-backend
     depends_on:
       postgres:
         condition: service_healthy
     ports:
-      - '3000:3000'
+      - '${PORT:-3000}:3000'
     networks:
-      - app-network-prod
-    volumes:
-      - ./public:/usr/src/app/public
-      - ./src:/usr/src/app/src
-      - ./package.json:/usr/src/app/package.json
-      - ./tsconfig.json:/usr/src/app/tsconfig.json
-    restart: unless-stopped
-    environment:
-      - POSTGRES_HOST=postgres
-      - NODE_ENV=production
+      - app-network
     env_file:
       - ./.env
+    environment:
+      NODE_ENV: production
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    volumes:
+      # Загрузки пользователей сохраняются между деплоями (не в образе)
+      - uploads_data:/usr/src/app/public/uploads
+    restart: unless-stopped
+    healthcheck:
+      # Проверка доступности Swagger (/api)
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:3000/api', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
-  pgdata:
+  pgdata: # данные Postgres (prod)
+  uploads_data: # media из POST /api/files/upload
 
 networks:
-  app-network-prod:
+  app-network:
     driver: bridge
