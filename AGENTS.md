@@ -26,7 +26,7 @@ docker compose -f compose.prod.yml up -d --build
 
 Переменные — `.env`. Внутри Docker backend всегда ходит в Postgres по `POSTGRES_HOST=postgres` и `POSTGRES_PORT=5432` (задаётся в compose). На хост проброс порта БД — `POSTGRES_PUBLISH_PORT`.
 
-Docker: multi-stage `Dockerfile` (`development` | `production`), `compose.yml` (dev), `compose.prod.yml` (стенд/VPS). CI/CD стенда — GitHub Actions → SSH → `scripts/deploy.sh`, см. `docs/DEPLOY-GITHUB-ACTIONS.md`.
+Docker: multi-stage `Dockerfile` (`development` | `production`), `compose.yml` (dev), `compose.prod.yml` (стенд/VPS). CI/CD: push в `main` → GitHub Actions → SSH (`DEPLOY_PATH`) → `compose.prod.yml up -d --build`, см. `docs/DEPLOY-GITHUB-ACTIONS.md`.
 
 ### Восстановление БД из backup
 

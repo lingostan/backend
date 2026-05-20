@@ -4,7 +4,7 @@
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: lingostan-postgres
+    container_name: lingostan-backend-postgres
     ports:
       - '${POSTGRES_PUBLISH_PORT:-5432}:5432'
     volumes:
@@ -34,7 +34,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production # стадия production: dist/ + start:prod
-    container_name: lingostan-backend
+    container_name: lingostan-backend-api
     depends_on:
       postgres:
         condition: service_healthy
