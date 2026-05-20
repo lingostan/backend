@@ -100,12 +100,12 @@ docker compose -f compose.prod.yml up -d --build
 
 ```bash
 docker compose up postgres -d
-docker cp ./backup-28.11.sql lingostan-postgres-dev:/tmp/backup.sql
-docker exec -it lingostan-postgres-dev psql -U postgres -d lingostan -f /tmp/backup.sql
+docker cp ./backup-28.11.sql lingostan-backend-postgres-dev:/tmp/backup.sql
+docker exec -it lingostan-backend-postgres-dev psql -U postgres -d lingostan -f /tmp/backup.sql
 docker compose up backend
 ```
 
-Имя базы `lingostan` — как в `.env` (`POSTGRES_DB`). Контейнер Postgres в production называется `lingostan-postgres`, команды те же, но с `-f compose.prod.yml`.
+Имя базы `lingostan` — как в `.env` (`POSTGRES_DB`). В production контейнер Postgres: `lingostan-backend-postgres` (`compose.prod.yml`).
 
 ---
 
@@ -125,7 +125,7 @@ docker compose up backend
 
 | Шаг | Действие |
 |-----|----------|
-| 1 | Один раз настроить сервер: Docker, `git clone`, `.env`, `compose.prod.yml up` |
+| 1 | На сервере: клон репозитория, файл `.env`, первый `compose.prod.yml up` |
 | 2 | В GitHub → Secrets: `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY`, `DEPLOY_PATH` |
 | 3 | `git push origin main` → деплой в Actions |
 

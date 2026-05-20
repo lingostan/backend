@@ -12,6 +12,7 @@
 
 services:
   backend:
+    container_name: lingostan-backend-api
     build:
       context: .
       dockerfile: Dockerfile
@@ -48,6 +49,7 @@ services:
       start_period: 40s
 
   postgres:
+    container_name: lingostan-backend-postgres
     image: postgres:15-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
